@@ -28,6 +28,7 @@ def choose_mode() -> int:
 
             if mode not in [1, 2]:
                 print("Please choose the number 1 or 2")
+                continue
             return mode
         except:
             raise ValueError("Unknown mode for Game")
@@ -53,6 +54,7 @@ def choose_level() -> float:
 
             if level not in list(range(1, 4)):
                 print("Please enter the number 1, 2, 3 or 4")
+                continue
             return levels[level]
         except:
             raise ValueError("Unknown level for Game")
@@ -82,8 +84,8 @@ if __name__ == "__main__":
 
     print(" === The English Game ===\n")
 
-    path = "../../../mnt/c/Users/user/Job/Smth/Backend/English/Dictionaries/The-Curious-Incident-of-the-Dog-in-the-Night-Time.md"
+    path = "../../../../mnt/c/Users/user/Job/Smth/Backend/English/Dictionaries/The-Curious-Incident-of-the-Dog-in-the-Night-Time.md"
     eng_dict = create_dict(path)
 
-    choose_mode()
-    run_game(key, eng_dict)
+    mode = choose_mode()
+    run_game(mode, eng_dict)
