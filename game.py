@@ -52,7 +52,7 @@ def choose_level() -> float:
         try:
             level = int(input("Choose The Game Level: "))
 
-            if level not in list(range(1, 4)):
+            if level not in list(range(1, 5)):
                 print("Please enter the number 1, 2, 3 or 4")
                 continue
             return levels[level]
@@ -66,18 +66,37 @@ def run_game(mode: int, eng_dict: Dict) -> None:
 
     print("\nStart The Process")
     print(20 * "-")
+
+    used = set()
+
+    result = 0
     while True:
         index = random.randint(0, len(eng_dict) - 1)
+        if index in used:
+            continue
+        used.add(index)
+
         word = list(eng_dict.keys())[index]
         translate = eng_dict[word]
       
         if mode == 2:
             word, translate = translate, word
-
-        print("Word: ", word)
-        time.sleep(speed)
+        
+        print(f"[{index + 1}] Word: ", word, sep=" ", end="")
+        #time.sleep(speed)
+        symbol = input()
+        if symbol == '':
+            result += 1
         print("Translate: ", translate, end="\n\n")
-        time.sleep(speed)
+        #time.sleep(1)
+
+        if len(used) == len(eng_dict):
+            print("\n == Game Over ==")
+            print(f"Result: {result * 100 //len(used)}% (result out of len(used))")
+            break
+
+        if len(used) % 10 == 0:
+            print(f" == {len(used) * 100 // len(eng_dict)}% completed ==\n")
 
 
 if __name__ == "__main__":
