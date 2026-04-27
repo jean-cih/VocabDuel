@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import re
 from typing import Dict
 import random
@@ -60,9 +62,7 @@ def choose_level() -> float:
             raise ValueError("Unknown level for Game")
 
 
-def run_game(mode: int, eng_dict: Dict) -> None:
-
-    speed = choose_level()
+def run_game(mode: int, speed: float, eng_dict: Dict) -> None:
 
     print("\nStart The Process")
     print(20 * "-")
@@ -100,11 +100,15 @@ def run_game(mode: int, eng_dict: Dict) -> None:
 
 
 if __name__ == "__main__":
-
+    
     print(" === The English Game ===\n")
 
-    path = "../../../../mnt/c/Users/user/Job/Smth/Backend/English/Dictionaries/The-Curious-Incident-of-the-Dog-in-the-Night-Time.md"
-    eng_dict = create_dict(path)
+    try:
+        path = "../../../../mnt/c/Users/user/Job/Smth/Backend/English/Dictionaries/The-Curious-Incident-of-the-Dog-in-the-Night-Time.md"
+        eng_dict = create_dict(path)
 
-    mode = choose_mode()
-    run_game(mode, eng_dict)
+        mode = choose_mode()
+        speed = choose_level()
+        run_game(mode, speed, eng_dict)
+    except Exception as e:
+        print(f"Error: {e}")
