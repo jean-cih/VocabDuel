@@ -6,9 +6,9 @@ import random
 import time
 import os
 
-
 # Можно добавить возможность пополнеиня словаря
 
+# Можно добавить игру с использованием слов в предложениии по уровню сложности, одно слово, два слова и т д
 
 def load_game() -> int:
 
@@ -75,9 +75,9 @@ def create_dict(file_path: str) -> Dict:
 
 
 def choose_mode() -> int:
-    print("Modes:")
-    print("1 - (to eng from rus)")
-    print("2 - (to rus from eng)")
+    print("Format's Translate:")
+    print("1.   Eng -> Rus")
+    print("2.   Rus -> Eng")
 
     while True:
         try:
@@ -97,22 +97,24 @@ def choose_level() -> float:
             2: 4.0,
             3: 2.0,
             4: 1.0,
-            5: 0.5
+            5: 0.5,
+            6: -1
     }
 
-    print("\nThere is 3 Levels")
-    print(" 1 - controlled")
-    print(" 2 - easy")
-    print(" 3 - medium")
-    print(" 4 - hard")
-    print(" 5 - english God")
+    print("\nThere is 6 Modes:")
+    print(" 1.  Controlled")
+    print(" 2.  Easy")
+    print(" 3.  Medium")
+    print(" 4.  Hard")
+    print(" 5.  English God")
+    print(" 6.  Exit")
 
     while True:
         try:
             level = int(input("Choose The Game Level: ").strip())
 
-            if level not in list(range(1, 6)):
-                print("Please, enter the number 1, 2, 3, 4 or 5")
+            if level not in list(range(1, 7)):
+                print("Please, enter the number 1, 2, 3, 4, 5 or 6")
                 continue
             return levels[level]
         except:
@@ -200,25 +202,54 @@ def choose_file(folder_path: str) -> str:
         raise ValueError("Unknown file's number")
 
 
+def add_new_words(filepath: str):
+    
+    number_new_word = 1
+    with open(filepath, "r") as file:
+        index_spot = -1
+        for line in file:
+            index_spot = line.find(".")
+
+        if index_spot >= 0:
+            number_new_word += int(line[0:index_spot])
+
+    print("\n - Tap q to exit this mode -")
+
+    while True:
+        with open(filepath, "a") as file:
+            new_word = input(" Input the new word: ").strip()
+            new_translate = input(" Input translate of new word: ").strip()
+
+            if new_word == 'q' or new_translate == 'q':
+                file.write("---\n")
+                break
+
+            file.write(f"{number_new_word}. **{new_word}** - {new_translate}\n")
+            number_new_word += 1
+           
+
 if __name__ == "__main__":
     path = "../../../../mnt/c/Users/user/Job/Smth/Backend/English/Dictionaries"
 
     try:
-        stat = load_game()
+        while True:
+            stat = load_game()
 
-        if stat == 3:
-            statistics_output(path)
-            exit(1)
+            if stat == 3:
+                statistics_output(path)
+                break
 
-        filepath = choose_file(path)
+            filepath = choose_file(path)
 
-        if stat == 1:
-            pass
-        elif stat == 2:
-            eng_dict = create_dict(filepath)
-            mode = choose_mode()
-            speed = choose_level()
-            run_game(mode, speed, eng_dict, filepath)
+            if stat == 1:
+                add_new_words(filepath)
+            elif stat == 2:
+                eng_dict = create_dict(filepath)
+                mode = choose_mode()
+                speed = choose_level()
+                if speed == -1:
+                    break
+                run_game(mode, speed, eng_dict, filepath)
 
     except Exception as e:
         print(f"Error: {e}")
