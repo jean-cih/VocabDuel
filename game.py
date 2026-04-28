@@ -7,11 +7,59 @@ import time
 import os
 
 
-# Можно добавить вывод статистики
-
 # Можно добавить возможность пополнеиня словаря
 
-# Добавить в игру отмечание выученных слов
+
+def load_game() -> int:
+
+    print("\n === The English Game ===\n")
+    time.sleep(1)
+    print("Hi, I'm Simple Game to memorize !!!\n")
+    time.sleep(2)
+    print("I have three options:")
+    print(" 1. Adding new words")
+    print(" 2. Training")
+    print(" 3. Statistics output")
+    time.sleep(1)
+
+    try:
+        while True:
+            option = int(input(" Tap what you want to do: ").strip())
+            if option not in [1, 2, 3]:
+                print("Please, tap option from the ragne 1, 2, 3")
+                continue
+            return option
+    except:
+        raise ValueError("Unknown option for This Game")
+
+
+def statistics_output(folder_path: str) -> None:
+    print("\n\n == Statistics ==\n")
+
+    paths = []
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            paths.append(os.path.join(root, file))
+
+    # Нет защиты от уникальных слов
+    all_known_words = 0
+    all_unknown_words = 0
+    for path in paths:
+        with open(path, "r") as file:
+            for line in file:
+                index_spot = line.find(".")
+                if index_spot == -1:
+                    continue
+                index = line.find("🔥")
+                if index >= 0:
+                    all_known_words += 1
+                else:
+                    all_unknown_words += 1
+
+    print(f"All known words: {all_known_words}")
+    print(f"All unknown words: {all_unknown_words}")
+    print(f"Total words: {all_known_words + all_unknown_words}\n")
+
 
 def create_dict(file_path: str) -> Dict:
     eng_dict = dict()
@@ -153,18 +201,24 @@ def choose_file(folder_path: str) -> str:
 
 
 if __name__ == "__main__":
-    
-    print(" === The English Game ===\n")
+    path = "../../../../mnt/c/Users/user/Job/Smth/Backend/English/Dictionaries"
 
     try:
-        path = "../../../../mnt/c/Users/user/Job/Smth/Backend/English/Dictionaries"
+        stat = load_game()
+
+        if stat == 3:
+            statistics_output(path)
+            exit(1)
 
         filepath = choose_file(path)
 
-        eng_dict = create_dict(filepath)
+        if stat == 1:
+            pass
+        elif stat == 2:
+            eng_dict = create_dict(filepath)
+            mode = choose_mode()
+            speed = choose_level()
+            run_game(mode, speed, eng_dict, filepath)
 
-        mode = choose_mode()
-        speed = choose_level()
-        run_game(mode, speed, eng_dict, filepath)
     except Exception as e:
         print(f"Error: {e}")
