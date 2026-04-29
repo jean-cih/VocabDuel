@@ -6,15 +6,13 @@ import random
 import time
 import os
 
-# Можно добавить возможность пополнеиня словаря
-
 # Можно добавить игру с использованием слов в предложениии по уровню сложности, одно слово, два слова и т д
 
 def load_game() -> int:
 
     print("\n === The English Game ===\n")
     time.sleep(1)
-    print("Hi, I'm Simple Game to memorize !!!\n")
+    greeting(" Hey, I'm Medora :)\n", " I'm a simple console trainer for memorizing words !!!")
     time.sleep(2)
     print("I have three options:")
     print(" 1. Adding new words")
@@ -26,12 +24,47 @@ def load_game() -> int:
         while True:
             option = int(input(" Tap what you want to do: ").strip())
             if option not in [1, 2, 3]:
-                print("Please, tap option from the ragne 1, 2, 3")
+                print_yellow("Please, tap option from the ragne 1, 2, 3")
                 continue
             return option
     except:
         raise ValueError("Unknown option for This Game")
 
+
+def greeting(greet_text: str, discription: str):
+    for char in greet_text:
+        print(char, end='', flush=True)
+        time.sleep(0.05)
+    
+    time.sleep(1)
+
+    for char in discription:
+        print(char, end='', flush=True)
+        time.sleep(0.05)
+
+    time.sleep(1)
+
+    for _ in range(9):
+        print('\b' + ' ' + '\b', end='', flush=True)
+        time.sleep(0.1)
+
+    for char in "English words !!!\n":
+        print(char, end='', flush=True)
+        time.sleep(0.05)
+
+    time.sleep(1)
+    
+    #print(" Obviously :)")
+
+    for char in " Obviously ":
+        print(char, end='', flush=True)
+        time.sleep(0.05)
+    time.sleep(1)
+    print(":)")
+
+    time.sleep(10)
+    exit(1)
+        
 
 def statistics_output(folder_path: str) -> None:
     print("\n\n == Statistics ==\n")
@@ -84,7 +117,7 @@ def choose_mode() -> int:
             mode = int(input("Choose The Game Mode: ").strip())
 
             if mode not in [1, 2]:
-                print("Please, enter the number 1 or 2")
+                print_yellow("Please, enter the number 1 or 2")
                 continue
             return mode
         except:
@@ -114,7 +147,7 @@ def choose_level() -> float:
             level = int(input("Choose The Game Level: ").strip())
 
             if level not in list(range(1, 7)):
-                print("Please, enter the number 1, 2, 3, 4, 5 or 6")
+                print_yellow("Please, enter the number 1, 2, 3, 4, 5 or 6")
                 continue
             return levels[level]
         except:
@@ -141,7 +174,7 @@ def run_game(mode: int, speed: float, eng_dict: Dict, filepath: str) -> None:
         if mode == 2:
             word, translate = translate, word
         
-        print(f"\n[{index + 1}] Word: ", word)
+        print(f"\n[{index + 1}] Word: ", word, end="")
         time.sleep(speed) 
         if speed == 0.0:
             symbol = input().strip()
@@ -172,8 +205,10 @@ def mark_known(filepath: str, number: int, known: bool):
 
     if known:
         new_content = content.replace(f"{number}. **", f"{number}. 🔥**")
+        print_green("studied")
     else:
         new_content = content.replace(f"{number}. 🔥**", f"{number}. **")
+        print_blue("forgot")
 
     with open(filepath, "w") as file:
         file.write(new_content)
@@ -195,7 +230,7 @@ def choose_file(folder_path: str) -> str:
         while True:
             index_file = int(input(" Choose The File's Number: ").strip())
             if index_file not in list(range(1, num)):
-                print(f"Please, enter the number from the range {list(range(1, num))}")
+                print_yellow(f"Please, enter the number from the range {list(range(1, num))}")
                 continue
             return paths[index_file - 1]
     except:
@@ -206,27 +241,46 @@ def add_new_words(filepath: str):
     
     number_new_word = 1
     with open(filepath, "r") as file:
-        index_spot = -1
         for line in file:
             index_spot = line.find(".")
 
-        if index_spot >= 0:
-            number_new_word += int(line[0:index_spot])
+            if index_spot >= 0:
+                number_new_word += 1
 
     print("\n - Tap q to exit this mode -")
 
     while True:
         with open(filepath, "a") as file:
-            new_word = input(" Input the new word: ").strip()
-            new_translate = input(" Input translate of new word: ").strip()
+            new_word = input("\n WORD: ").strip().encode('utf-8', 'ignore').decode('utf-8')
+            new_translate = input(" TRANSLATE: ").strip().encode('utf-8', 'ignore').decode('utf-8')
 
             if new_word == 'q' or new_translate == 'q':
                 file.write("---\n")
                 break
 
             file.write(f"{number_new_word}. **{new_word}** - {new_translate}\n")
+            print_green(f"{new_word} was added")
             number_new_word += 1
-           
+          
+
+
+
+
+
+
+
+
+def print_green(text: str):
+    print(f"\033[32m -- {text} --\033[0m")
+
+def print_red(text: str):
+    print(f"\033[31m -- {text} --\033[0m")
+
+def print_yellow(text: str):
+    print(f"\033[33m -- {text} --\033[0m")
+
+def print_blue(text: str):
+    print(f"\033[34m -- {text} --\033[0m")
 
 if __name__ == "__main__":
     path = "../../../../mnt/c/Users/user/Job/Smth/Backend/English/Dictionaries"
@@ -252,4 +306,4 @@ if __name__ == "__main__":
                 run_game(mode, speed, eng_dict, filepath)
 
     except Exception as e:
-        print(f"Error: {e}")
+        print_red(f"Error: {e}")
