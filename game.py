@@ -11,18 +11,19 @@ import os
 def load_game() -> int:
 
     print("\n === The English Game ===\n")
-    time.sleep(1)
-    greeting(" Hey, I'm Medora :)\n", " I'm a simple console trainer for memorizing words !!!")
-    time.sleep(2)
-    print("I have three options:")
-    print(" 1. Adding new words")
-    print(" 2. Training")
-    print(" 3. Statistics output")
-    time.sleep(1)
 
+    answer = input("Do you wanna understand in detail? (Yes | No) ").strip().lower()
+    if answer == "yes":
+        time.sleep(0.5)
+        greeting("\n Good\n I'm Medora :)\n", " I'm a simple console trainer for memorizing words !!!")
+        time.sleep(2)
+
+    choose_option("\n I can offer you something:\n")
+    time.sleep(1)
+    
     try:
         while True:
-            option = int(input(" Tap what you want to do: ").strip())
+            option = int(input(" What do You want: ").strip())
             if option not in [1, 2, 3]:
                 print_yellow("Please, tap option from the ragne 1, 2, 3")
                 continue
@@ -31,40 +32,42 @@ def load_game() -> int:
         raise ValueError("Unknown option for This Game")
 
 
-def greeting(greet_text: str, discription: str):
-    for char in greet_text:
+def typing(text: str, delay: float):
+    for char in text:
         print(char, end='', flush=True)
-        time.sleep(0.05)
-    
-    time.sleep(1)
+        time.sleep(delay)
 
-    for char in discription:
-        print(char, end='', flush=True)
-        time.sleep(0.05)
-
-    time.sleep(1)
-
-    for _ in range(9):
+def typing_delete(bound: int, delay: float):
+    for _ in range(bound):
         print('\b' + ' ' + '\b', end='', flush=True)
-        time.sleep(0.1)
+        time.sleep(delay)
 
-    for char in "English words !!!\n":
-        print(char, end='', flush=True)
-        time.sleep(0.05)
 
+def greeting(greet_text: str, discription: str):
+    typing(greet_text, 0.05)
     time.sleep(1)
-    
-    #print(" Obviously :)")
 
-    for char in " Obviously ":
-        print(char, end='', flush=True)
-        time.sleep(0.05)
+    typing(discription, 0.05)
     time.sleep(1)
-    print(":)")
 
-    time.sleep(10)
-    exit(1)
-        
+    typing_delete(9, 0.1)
+
+    typing("English words !!!\n", 0.05)
+    time.sleep(1)
+
+    typing(" Obviously :)\n", 0.05)
+    time.sleep(1)
+      
+
+def choose_option(text: str):
+    typing(text, 0.05)
+    time.sleep(1)
+    print(" 1. Top-up")
+    time.sleep(0.5)
+    print(" 2. Practice")
+    time.sleep(0.5)
+    print(" 3. Progress")
+
 
 def statistics_output(folder_path: str) -> None:
     print("\n\n == Statistics ==\n")
@@ -108,13 +111,13 @@ def create_dict(file_path: str) -> Dict:
 
 
 def choose_mode() -> int:
-    print("Format's Translate:")
+    print("\n == Options ==\n")
     print("1.   Eng -> Rus")
     print("2.   Rus -> Eng")
 
     while True:
         try:
-            mode = int(input("Choose The Game Mode: ").strip())
+            mode = int(input("Choose Opt: ").strip())
 
             if mode not in [1, 2]:
                 print_yellow("Please, enter the number 1 or 2")
@@ -134,7 +137,7 @@ def choose_level() -> float:
             6: -1
     }
 
-    print("\nThere is 6 Modes:")
+    print("\n == All Modes ==\n")
     print(" 1.  Controlled")
     print(" 2.  Easy")
     print(" 3.  Medium")
@@ -144,7 +147,7 @@ def choose_level() -> float:
 
     while True:
         try:
-            level = int(input("Choose The Game Level: ").strip())
+            level = int(input("Choose Mode: ").strip())
 
             if level not in list(range(1, 7)):
                 print_yellow("Please, enter the number 1, 2, 3, 4, 5 or 6")
@@ -174,20 +177,16 @@ def run_game(mode: int, speed: float, eng_dict: Dict, filepath: str) -> None:
         if mode == 2:
             word, translate = translate, word
         
-        print(f"\n[{index + 1}] Word: ", word, end="")
-        time.sleep(speed) 
-        if speed == 0.0:
-            symbol = input().strip()
-            if symbol == '':
-                mark_known(filepath, index + 1, True)
-                result += 1
-            elif symbol == 'q':
-                print(" == Exit ==")
-                exit(1)
-            else:
-                mark_known(filepath, index + 1, False)
-
+        print(f"\n[{index + 1}] Word: ", word, end=" ")
+        #time.sleep(speed) 
+        symbol = input().strip()
         print("Translate: ", translate)
+
+        if symbol == '':
+            mark_known(filepath, index + 1, True)
+            result += 1
+        else:
+            mark_known(filepath, index + 1, False)
         time.sleep(1.0)
 
         if len(used) == len(eng_dict):
@@ -228,7 +227,7 @@ def choose_file(folder_path: str) -> str:
 
     try:
         while True:
-            index_file = int(input(" Choose The File's Number: ").strip())
+            index_file = int(input(" Choose The File: ").strip())
             if index_file not in list(range(1, num)):
                 print_yellow(f"Please, enter the number from the range {list(range(1, num))}")
                 continue
@@ -247,7 +246,7 @@ def add_new_words(filepath: str):
             if index_spot >= 0:
                 number_new_word += 1
 
-    print("\n - Tap q to exit this mode -")
+    print("\n - Tap q to exit -")
 
     while True:
         with open(filepath, "a") as file:
