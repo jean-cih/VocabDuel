@@ -25,7 +25,6 @@ def load_game() -> int:
         time.sleep(2)
 
     choose_option("\n I can offer you something:\n")
-    time.sleep(1)
     
     try:
         while True:
@@ -66,12 +65,9 @@ def greeting(greet_text: str, discription: str):
       
 
 def choose_option(text: str):
-    typing(text, 0.05)
-    time.sleep(1)
+    typing(text, 0)
     print(" 1. Top-up")
-    time.sleep(0.5)
     print(" 2. Practice")
-    time.sleep(0.5)
     print(" 3. Progress")
 
 
@@ -103,23 +99,37 @@ def statistics_output(folder_path: str) -> None:
     print(f"Total words: {all_known_words + all_unknown_words}\n")
 
 
-def create_dict(file_path: str) -> Dict:
-
+def create_dict(file_path: str) -> Dict[str, tuple[str, int]]:
     option = int(input("Do you wanna learn all or only unknown words? (1 | 2) ").strip())
 
-    eng_dict = dict()
-    with open(file_path, 'r') as file:
+    eng_dict = {}
+    with open(file_path, 'r', encoding='utf-8') as file:
         for line in file:
-            match_eng_word = re.search(r'\*\*(.+?)\*\*', line)
-            match_trans = re.search(r' - (.*)', line)
-            
-            if option == 2 and line.find("🔥") >= 0:
+    
+            if option == 2 and "🔥" in line:
                 continue
 
-            if match_eng_word and match_trans:
-                eng_dict[match_eng_word.group(1)] = match_trans.group(1)
+            match_eng_word = re.search(r'\*\*(.+?)\*\*', line)
+            match_trans = re.search(r'[\-–—]\s*(.*)$', line)
 
-    return eng_dict        
+            if not match_eng_word or not match_trans:
+                continue
+
+            index = line.find('.')
+            if index == -1:
+                continue
+
+            try:
+                number = int(line[:index].strip())
+            except ValueError:
+                continue
+
+            eng_word = match_eng_word.group(1).strip()
+            translation = match_trans.group(1).strip()
+
+            eng_dict[eng_word] = (translation, number)
+
+    return eng_dict
 
 
 def choose_mode() -> int:
@@ -177,16 +187,12 @@ def run_game(mode: int, speed: float, eng_dict: Dict, filepath: str) -> None:
     used = set()
     result = 0
     if speed > 0:
-        run_time_game(speed, used, result)
+        result = run_time_game(speed, eng_dict, used)
     else:
-        run_control_game(used, result)
+        result = run_control_game(eng_dict, used)
 
-    if len(used) == len(eng_dict):
-        print("\n == Game Over ==")
-        print(f"Result: {result * 100 //len(used)}% (result out of len(used))")
-
-    if len(used) % 10 == 0:
-        print(f" == {len(used) * 100 // len(eng_dict)}% completed ==\n")
+    print("\n == Game Over ==")
+    print(f"Result: {result * 100 //len(eng_dict)}% ({result} out of {len(eng_dict)})")
 
 
 def wait_for_non_q(speed: float):
@@ -216,71 +222,87 @@ def wait_for_non_q(speed: float):
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 
-def run_time_game(speed: float, used: Set, result: int):
+def run_time_game(speed: float, created_dict: Dict, used: Set) -> int:
     result = 0
 
     while True:
-        index = random.randint(0, len(eng_dict) - 1)
+        index = random.randint(0, len(created_dict) - 1)
         if index in used:
             continue
 
         used.add(index)
 
-        word = list(eng_dict.keys())[index]
-        translate = eng_dict[word]
+        word = list(created_dict.keys())[index]
+        translate = created_dict[word][0]
       
         if mode == 2:
             word, translate = translate, word    
 
-        print(f"\n[{index + 1}] Word: ", word)
+        print(f"\n[{created_dict[word][1]}] - Word: ", word.strip())
 
         result_tap = wait_for_non_q(speed)
         if result_tap is True:
-            mark_known(filepath, index + 1, True)
+            mark_known(filepath, created_dict[word][1]  + 1, True)
             result += 1
         elif result_tap is False:
             break
         else:
-            mark_known(filepath, index + 1, False) 
+            mark_known(filepath, created_dict[word][1], False) 
 
-        print("Translate: ", translate)
+        print("Translate: ", translate.strip())
+
+        if len(used) % 10 == 0:
+            print(f" == {len(used) * 100 // len(eng_dict)}% completed ==\n")
+
+        if len(used) == len(created_dict):
+            break
 
         time.sleep(1.0)
 
+    return result
 
-def run_control_game(used: Set, result: int):
+
+def run_control_game(created_dict: Dict, used: Set) -> int:
     result = 0
 
     while True:
-        index = random.randint(0, len(eng_dict) - 1)
+        index = random.randint(0, len(created_dict) - 1)
         if index in used:
             continue
 
         used.add(index)
 
-        word = list(eng_dict.keys())[index]
-        translate = eng_dict[word]
-      
+        word = list(created_dict.keys())[index]
+        translate = created_dict[word][0]     
+        number = created_dict[word][1]
+     
         if mode == 2:
-            word, translate = translate, word    
+            word, translate = translate, word
 
-        print(f"\n[{index + 1}] Word: ", word, end=" ")
-
+        print(f"\n[{number}] Word: ", word.strip(), end=" ")
+        input()
+        print("Translate: ", translate.strip())
         symbol = input().strip()
         if symbol == '':
-            mark_known(filepath, index + 1, True)
+            mark_known(filepath, number, True)
             result += 1
         elif symbol == 'q':
             break
         else:
-            mark_known(filepath, index + 1, False)
+            mark_known(filepath, number, False)
 
-        print("Translate: ", translate)
+        if len(used) % 10 == 0:
+            print(f" == {len(used) * 100 // len(eng_dict)}% completed ==\n")
+
+        if len(used) == len(created_dict):
+            break
 
         time.sleep(1.0)
 
+    return result
 
-def mark_known(filepath: str, number: int, known: bool):
+
+def mark_known1(filepath: str, number: int, known: bool):
     with open(filepath, "r") as file:
         content = file.read()
 
@@ -293,6 +315,37 @@ def mark_known(filepath: str, number: int, known: bool):
 
     with open(filepath, "w") as file:
         file.write(new_content)
+
+
+def mark_known(filepath: str, number: int, known: bool):
+    with open(filepath, "r", encoding="utf-8") as file:
+        lines = file.readlines()
+
+    new_lines = []
+    found = False
+
+    for line in lines:
+        if line.strip().startswith(f"{number}."):
+            found = True
+            if known:
+                if "🔥" not in line:
+                    new_line = line.replace(f"{number}. **", f"{number}. 🔥**")
+                    print_green("studied")
+                else:
+                    new_line = line
+                    print_green("already studied")
+            else:
+                new_line = line.replace(f"{number}. 🔥**", f"{number}. **")
+                print_blue("forgot")
+            new_lines.append(new_line)
+        else:
+            new_lines.append(line)
+
+    if not found:
+        print(f"Word with number {number} not found!")
+
+    with open(filepath, "w", encoding="utf-8") as file:
+        file.writelines(new_lines)
 
 
 def choose_file(folder_path: str) -> str:
@@ -388,3 +441,4 @@ if __name__ == "__main__":
 
     except Exception as e:
         print_red(f"Error: {e}")
+        
