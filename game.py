@@ -417,7 +417,7 @@ def print_blue(text: str):
     print(f"\033[34m -- {text} --\033[0m")
 
 if __name__ == "__main__":
-    path = "../../../../mnt/c/Users/user/Job/Smth/Backend/English/Dictionaries"
+    path = "Dictionaries"
 
     try:
         while True:
