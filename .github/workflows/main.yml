@@ -1,0 +1,27 @@
+name: Checking code by style Black
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  style_check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonning Dir
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Black
+        run: pip install black
+
+      - name: Formatting check Black
+        run: black --check game/
+
+
