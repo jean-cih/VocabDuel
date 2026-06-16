@@ -12,22 +12,24 @@ from game.views.display import *
 
 
 def create_dict(file_path: str) -> Dict[str, tuple[str, int]]:
-    option = int(input("Do you wanna learn all or only unknown words? (1 | 2) ").strip())
+    option = int(
+        input("Do you wanna learn all or only unknown words? (1 | 2) ").strip()
+    )
 
     eng_dict = {}
-    with open(file_path, 'r', encoding='utf-8') as file:
+    with open(file_path, "r", encoding="utf-8") as file:
         for line in file:
-    
+
             if option == 2 and "🔥" in line:
                 continue
 
-            match_eng_word = re.search(r'\*\*(.+?)\*\*', line)
-            match_trans = re.search(r'[\-–—]\s*(.*)$', line)
+            match_eng_word = re.search(r"\*\*(.+?)\*\*", line)
+            match_trans = re.search(r"[\-–—]\s*(.*)$", line)
 
             if not match_eng_word or not match_trans:
                 continue
 
-            index = line.find('.')
+            index = line.find(".")
             if index == -1:
                 continue
 
@@ -62,14 +64,7 @@ def choose_mode() -> int:
 
 
 def choose_level() -> float:
-    levels = {
-            1: 0.0,
-            2: 4.0,
-            3: 2.0,
-            4: 1.0,
-            5: 0.5,
-            6: -1
-    }
+    levels = {1: 0.0, 2: 4.0, 3: 2.0, 4: 1.0, 5: 0.5, 6: -1}
 
     print("\n == All Modes ==\n")
     print(" 1.  Controlled")
@@ -110,10 +105,10 @@ def run_game(mode: int, speed: float, eng_dict: Dict, filepath: str) -> None:
 def wait_for_non_q(speed: float):
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
-    
+
     try:
         tty.setraw(fd)
-        
+
         start_time = time.time()
         last_printed_second = -1
         while time.time() - start_time <= speed + 1:
@@ -124,17 +119,19 @@ def wait_for_non_q(speed: float):
 
             if select.select([sys.stdin], [], [], 0.05)[0]:
                 ch = sys.stdin.read(1).lower()
-                if ch != 'q':
+                if ch != "q":
                     return True
-                elif ch == 'q':
+                elif ch == "q":
                     return False
         return None
-        
+
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 
-def run_time_game(mode: int, speed: float, created_dict: Dict, used: Set, filepath: str) -> int:
+def run_time_game(
+    mode: int, speed: float, created_dict: Dict, used: Set, filepath: str
+) -> int:
     result = 0
 
     while True:
@@ -146,20 +143,20 @@ def run_time_game(mode: int, speed: float, created_dict: Dict, used: Set, filepa
 
         word = list(created_dict.keys())[index]
         translate = created_dict[word][0]
-      
+
         if mode == 2:
-            word, translate = translate, word    
+            word, translate = translate, word
 
         print(f"\n[{created_dict[word][1]}] - Word: ", word.strip(), end=" ")
 
         result_tap = wait_for_non_q(speed)
         if result_tap is True:
-            mark_known(filepath, created_dict[word][1]  + 1, True)
+            mark_known(filepath, created_dict[word][1] + 1, True)
             result += 1
         elif result_tap is False:
             break
         else:
-            mark_known(filepath, created_dict[word][1], False) 
+            mark_known(filepath, created_dict[word][1], False)
 
         print("Translate: ", translate.strip(), end=" ")
 
@@ -185,9 +182,9 @@ def run_control_game(mode: int, created_dict: Dict, used: Set, filepath: str) ->
         used.add(index)
 
         word = list(created_dict.keys())[index]
-        translate = created_dict[word][0]     
+        translate = created_dict[word][0]
         number = created_dict[word][1]
-     
+
         if mode == 2:
             word, translate = translate, word
 
@@ -195,10 +192,10 @@ def run_control_game(mode: int, created_dict: Dict, used: Set, filepath: str) ->
         input()
         print("Translate: ", translate.strip(), end=" ")
         symbol = input().strip()
-        if symbol == '':
+        if symbol == "":
             mark_known(filepath, number, True)
             result += 1
-        elif symbol == 'q':
+        elif symbol == "q":
             break
         else:
             mark_known(filepath, number, False)
@@ -261,7 +258,9 @@ def choose_file(folder_path: str) -> str:
         while True:
             index_file = int(input(" Choose The File: ").strip())
             if index_file not in list(range(1, num)):
-                print_yellow(f"Please, enter the number from the range {list(range(1, num))}")
+                print_yellow(
+                    f"Please, enter the number from the range {list(range(1, num))}"
+                )
                 continue
             return paths[index_file - 1]
     except:
@@ -269,7 +268,7 @@ def choose_file(folder_path: str) -> str:
 
 
 def add_new_words(filepath: str):
-    
+
     number_new_word = 1
     with open(filepath, "r") as file:
         for line in file:
@@ -282,10 +281,14 @@ def add_new_words(filepath: str):
 
     while True:
         with open(filepath, "a") as file:
-            new_word = input("\n Word: ").strip().encode('utf-8', 'ignore').decode('utf-8')
-            new_translate = input(" Translate: ").strip().encode('utf-8', 'ignore').decode('utf-8')
+            new_word = (
+                input("\n Word: ").strip().encode("utf-8", "ignore").decode("utf-8")
+            )
+            new_translate = (
+                input(" Translate: ").strip().encode("utf-8", "ignore").decode("utf-8")
+            )
 
-            if new_word == 'q' or new_translate == 'q':
+            if new_word == "q" or new_translate == "q":
                 file.write("---\n")
                 break
 
