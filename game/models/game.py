@@ -10,6 +10,7 @@ import traceback
 
 # Сделать среднее время запоминания, можно просто суммировать то время где я вспомнил и разделить на result
 
+
 def main():
     path = "../../../mnt/c/Работа/MyBrainObsidian/personal-obsidian-vault/English/Dictionaries"
 
@@ -37,4 +38,4 @@ def main():
 
 
 if __name__ == "__main__":
-        main()
+    main()
