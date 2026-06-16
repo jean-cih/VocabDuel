@@ -238,7 +238,7 @@ def run_time_game(speed: float, created_dict: Dict, used: Set) -> int:
         if mode == 2:
             word, translate = translate, word    
 
-        print(f"\n[{created_dict[word][1]}] - Word: ", word.strip())
+        print(f"\n[{created_dict[word][1]}] - Word: ", word.strip(), end=" ")
 
         result_tap = wait_for_non_q(speed)
         if result_tap is True:
@@ -249,7 +249,7 @@ def run_time_game(speed: float, created_dict: Dict, used: Set) -> int:
         else:
             mark_known(filepath, created_dict[word][1], False) 
 
-        print("Translate: ", translate.strip())
+        print("Translate: ", translate.strip(), end=" ")
 
         if len(used) % 10 == 0:
             print(f" == {len(used) * 100 // len(eng_dict)}% completed ==\n")
@@ -281,7 +281,7 @@ def run_control_game(created_dict: Dict, used: Set) -> int:
 
         print(f"\n[{number}] Word: ", word.strip(), end=" ")
         input()
-        print("Translate: ", translate.strip())
+        print("Translate: ", translate.strip(), end=" ")
         symbol = input().strip()
         if symbol == '':
             mark_known(filepath, number, True)
@@ -300,21 +300,6 @@ def run_control_game(created_dict: Dict, used: Set) -> int:
         time.sleep(1.0)
 
     return result
-
-
-def mark_known1(filepath: str, number: int, known: bool):
-    with open(filepath, "r") as file:
-        content = file.read()
-
-    if known:
-        new_content = content.replace(f"{number}. **", f"{number}. 🔥**")
-        print_green("studied")
-    else:
-        new_content = content.replace(f"{number}. 🔥**", f"{number}. **")
-        print_blue("forgot")
-
-    with open(filepath, "w") as file:
-        file.write(new_content)
 
 
 def mark_known(filepath: str, number: int, known: bool):
@@ -400,10 +385,6 @@ def add_new_words(filepath: str):
 
 
 
-
-
-
-
 def print_green(text: str):
     print(f"\033[32m -- {text} --\033[0m")
 
@@ -417,7 +398,7 @@ def print_blue(text: str):
     print(f"\033[34m -- {text} --\033[0m")
 
 if __name__ == "__main__":
-    path = "Dictionaries"
+    path = "../../../mnt/c/Работа/MyBrainObsidian/personal-obsidian-vault/English/Dictionaries"
 
     try:
         while True:
