@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
-from game.controllers.kernel import *
-from game.views.display import *
+from english_learning_app.controllers.kernel import *
+from english_learning_app.static.display import *
 import traceback
 
 # Можно добавить игру с использованием слов в предложениии по уровню сложности, одно слово, два слова и т д

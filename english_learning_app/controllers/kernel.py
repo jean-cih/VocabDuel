@@ -8,7 +8,7 @@ import random
 import select
 import os
 
-from game.views.display import *
+from english_learning_app.static.display import *
 
 
 def create_dict(file_path: str) -> Dict[str, tuple[str, int]]:
