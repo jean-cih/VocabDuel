@@ -161,7 +161,7 @@ def run_time_game(
         print("Translate: ", translate.strip(), end=" ")
 
         if len(used) % 10 == 0:
-            print(f" == {len(used) * 100 // len(eng_dict)}% completed ==\n")
+            print(f" == {len(used) * 100 // len(created_dict)}% completed ==\n")
 
         if len(used) == len(created_dict):
             break
@@ -201,7 +201,7 @@ def run_control_game(mode: int, created_dict: Dict, used: Set, filepath: str) ->
             mark_known(filepath, number, False)
 
         if len(used) % 10 == 0:
-            print(f" == {len(used) * 100 // len(eng_dict)}% completed ==\n")
+            print(f" == {len(used) * 100 // len(created_dict)}% completed ==\n")
 
         if len(used) == len(created_dict):
             break
