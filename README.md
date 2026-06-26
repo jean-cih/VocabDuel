@@ -20,3 +20,8 @@ VocabDuel — это минималистичный CLI-тренажёр для 
 ```bash
 git clone https://github.com/yourusername/FlashVocab.git
 cd VocabDuel
+```
+
+### Архитектура приложения
+
+ ![](assets/VocabDuel.png)
