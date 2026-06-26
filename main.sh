@@ -17,4 +17,4 @@
 #      REVISION:  ---
 #===============================================================================
 
-python3 -m game.models.game
+python3 -m english_learning_app.models.game
