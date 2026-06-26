@@ -9,11 +9,12 @@ folder_path = Path("../../data-base")
 
 app = FastAPI()
 
+
 @app.get("/dicts")
 def get_all_dicts() -> Dict[int, str]:
     index = 0
     dict_names = {}
-    for file_path in folder_path.rglob('*'):
+    for file_path in folder_path.rglob("*"):
         if file_path.is_file():
             dict_names[index] = file_path.name
             index += 1
@@ -23,7 +24,7 @@ def get_all_dicts() -> Dict[int, str]:
 
 @app.get("/words/random")
 def get_word_by_dict_id(dict_id: int) -> str:
-    for index, file_path in enumerate(folder_path.rglob('*')):
+    for index, file_path in enumerate(folder_path.rglob("*")):
         if index == dict_id:
             rand_index = random.randint(0, get_amount_words(file_path) - 1)
             with open(file_path, "r") as file:
@@ -36,15 +37,18 @@ def get_word_by_dict_id(dict_id: int) -> str:
 @app.get("/words")
 def get_all_words(dict_id: int) -> Dict[int, Tuple[str, str]]:
     words = {}
-    for index, file_path in enumerate(folder_path.rglob('*')):
+    for index, file_path in enumerate(folder_path.rglob("*")):
         if index == dict_id:
             with open(file_path, "r", encoding="utf-8") as file:
                 for index, line in enumerate(file):
                     eng_word = re.search(r"\*\*(.+?)\*\*", line)
                     trans_word = re.search(r"[\-–—]\s*(.*)$", line)
-                    words[index] = (eng_word.group(1).strip(), trans_word.group(1).strip())
+                    words[index] = (
+                        eng_word.group(1).strip(),
+                        trans_word.group(1).strip(),
+                    )
             break
-   
+
     return words
 
 
@@ -64,7 +68,9 @@ def add_word_in_dict(dict_id: int = Body(embed=True), word: list = Body(embed=Tr
     for index, file_path in enumerate(folder_path.rglob("*")):
         if index == dict_id:
             with open(file_path, "a") as file:
-                new_line = f"\n{get_amount_words(file_path) + 1}. **{word[0]}** - {word[1]}"
+                new_line = (
+                    f"\n{get_amount_words(file_path) + 1}. **{word[0]}** - {word[1]}"
+                )
                 file.write(new_line)
             break
 
@@ -83,14 +89,14 @@ def delete_word(dict_id: int = Body(embed=True), word_id: int = Body(embed=True)
                     new_lines.append(new_line)
                 else:
                     new_lines.append(line)
-            
+
             with open(file_path, "w") as file:
                 file.writelines(new_lines)
-                
+
             break
 
 
-
 if __name__ == "__main__":
-    import uvicorn 
+    import uvicorn
+
     uvicorn.run("game_controller:app", reload=True)
