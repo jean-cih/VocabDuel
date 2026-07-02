@@ -23,12 +23,6 @@ def create_dict(file_path: str) -> Dict[str, tuple[str, int]]:
             if option == 2 and "🔥" in line:
                 continue
 
-            match_eng_word = re.search(r"\*\*(.+?)\*\*", line)
-            match_trans = re.search(r"[\-–—]\s*(.*)$", line)
-
-            if not match_eng_word or not match_trans:
-                continue
-
             index = line.find(".")
             if index == -1:
                 continue
@@ -38,10 +32,32 @@ def create_dict(file_path: str) -> Dict[str, tuple[str, int]]:
             except ValueError:
                 continue
 
-            eng_word = match_eng_word.group(1).strip()
-            translation = match_trans.group(1).strip()
+            pattern = r"\*\*([^*]+)\*\*\s*[\-–—]\s*([^_]+?)(?:\s*(_)|$)"
 
-            eng_dict[eng_word] = (translation, number)
+            match = re.search(pattern, line)
+            if match:
+                english = match.group(1)
+                russian = match.group(2).strip()
+                bracket_part = match.group(3)
+
+                if bracket_part:
+                    bracket_match = re.search(r"_.*$", line)
+                    bracket_full = bracket_match.group(0) if bracket_match else ""
+
+                    numbers = bracket_full.split(";")
+                    f_index = numbers[0].find("- ") + 2
+
+                    u_index = numbers[1].find("- ") + 2
+                    u_end_index = numbers[1].find(")_")
+
+                    eng_dict[english] = (
+                        russian,
+                        number,
+                        int(numbers[0][f_index:]),
+                        int(numbers[1][u_index:u_end_index]),
+                    )
+                else:
+                    eng_dict[english] = (russian, number, 0, 0)
 
     return eng_dict
 
@@ -100,6 +116,8 @@ def run_game(mode: int, speed: float, eng_dict: Dict, filepath: str) -> None:
 
     print("\n == Game Over ==")
     print(f"Result: {result * 100 //len(eng_dict)}% ({result} out of {len(eng_dict)})")
+
+    game_over_write(filepath, result)
 
 
 def wait_for_non_q(speed: float):
@@ -173,7 +191,6 @@ def run_time_game(
 
 def run_control_game(mode: int, created_dict: Dict, used: Set, filepath: str) -> int:
     result = 0
-
     while True:
         index = random.randint(0, len(created_dict) - 1)
         if index in used:
@@ -184,6 +201,8 @@ def run_control_game(mode: int, created_dict: Dict, used: Set, filepath: str) ->
         word = list(created_dict.keys())[index]
         translate = created_dict[word][0]
         number = created_dict[word][1]
+        forgettable = created_dict[word][2]
+        understandable = created_dict[word][3]
 
         if mode == 2:
             word, translate = translate, word
@@ -193,12 +212,12 @@ def run_control_game(mode: int, created_dict: Dict, used: Set, filepath: str) ->
         print("Translate: ", translate.strip(), end=" ")
         symbol = input().strip()
         if symbol == "":
-            mark_known(filepath, number, True)
+            mark_known(filepath, number, forgettable, understandable, True)
             result += 1
         elif symbol == "q":
             break
         else:
-            mark_known(filepath, number, False)
+            mark_known(filepath, number, forgettable, understandable, False)
 
         if len(used) % 10 == 0:
             print(f" == {len(used) * 100 // len(created_dict)}% completed ==\n")
@@ -211,7 +230,7 @@ def run_control_game(mode: int, created_dict: Dict, used: Set, filepath: str) ->
     return result
 
 
-def mark_known(filepath: str, number: int, known: bool):
+def mark_known(filepath: str, number: int, f_count: int, u_count: int, known: bool):
     with open(filepath, "r", encoding="utf-8") as file:
         lines = file.readlines()
 
@@ -221,15 +240,30 @@ def mark_known(filepath: str, number: int, known: bool):
     for line in lines:
         if line.strip().startswith(f"{number}."):
             found = True
+
+            stat_index = line.find("_(")
+            if stat_index == -1:
+                line = line[:-1] + " _(🤯F - 0; 🧠U - 0)_\n"
+
             if known:
+                line_with_stat = line.replace(
+                    f"_(🤯F - {f_count}; 🧠U - {u_count})_",
+                    f"_(🤯F - {f_count}; 🧠U - {u_count + 1})_",
+                )
                 if "🔥" not in line:
-                    new_line = line.replace(f"{number}. **", f"{number}. 🔥**")
+                    new_line = line_with_stat.replace(
+                        f"{number}. **", f"{number}. 🔥**"
+                    )
                     print_green("studied")
                 else:
-                    new_line = line
+                    new_line = line_with_stat
                     print_green("already studied")
             else:
-                new_line = line.replace(f"{number}. 🔥**", f"{number}. **")
+                line_with_stat = line.replace(
+                    f"_(🤯F - {f_count}; 🧠U - {u_count})_",
+                    f"_(🤯F - {f_count + 1}; 🧠U - {u_count})_",
+                )
+                new_line = line_with_stat.replace(f"{number}. 🔥**", f"{number}. **")
                 print_blue("forgot")
             new_lines.append(new_line)
         else:
@@ -295,3 +329,52 @@ def add_new_words(filepath: str):
             file.write(f"{number_new_word}. **{new_word}** - {new_translate}\n")
             print_green(f"{new_word} was added")
             number_new_word += 1
+
+
+def game_over_write(filepath: str, round_result: int):
+    template = {
+        "The Number of page repetitions": 0,
+        "Average page comprehension (%)": 0.0,
+        "The Number of 🤯 Forgettable words": 0,
+        "The Number of 🧠 Understandable words": 0,
+    }
+
+    with open(filepath, "r", encoding="utf-8") as file:
+        content = file.read()
+
+    understandable_words_count = content.count("🔥")
+    all_words = content.count("**") // 2 - 1
+
+    stat_pattern = r"\*\*Statistic:\*\*.*?(?=\n\n|\Z|(?=\n\d+\.))"
+    stat_match = re.search(stat_pattern, content, re.DOTALL)
+
+    if stat_match:
+        stat_block = stat_match.group(0)
+        for key in template.keys():
+            pattern = rf"{re.escape(key)}:\s*([0-9]+)"
+            match = re.search(pattern, stat_block)
+            if match:
+                template[key] = int(match.group(1))
+
+        template["The Number of page repetitions"] += 1
+
+        content = content.replace(stat_block, "")
+    else:
+        template["The Number of page repetitions"] = 1
+
+    template["Average page comprehension (%)"] = round(
+        understandable_words_count * 100 / all_words, 1
+    )
+    template["The Number of 🤯 Forgettable words"] = (
+        all_words - understandable_words_count
+    )
+    template["The Number of 🧠 Understandable words"] = understandable_words_count
+
+    new_stat_block = "**Statistic:**\n"
+    for key, value in template.items():
+        new_stat_block += f"- _{key}: {value}\n"
+    new_stat_block += "\n"
+
+    with open(filepath, "w", encoding="utf-8") as file:
+        file.write(new_stat_block)
+        file.write(content.lstrip())
