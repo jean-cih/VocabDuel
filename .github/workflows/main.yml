@@ -18,10 +18,25 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install Black
-        run: pip install black
+      - name: Install Dependents
+        run: pip install -r requirements.txt
 
       - name: Formatting check Black
         run: black --check english_learning_app/
 
+  jumpstart_check:
+    runs-on: ubuntu-latest
+    needs: style_check
+    steps:
+      - name: Clone Dir
+        uses: actions/checkout@v4
 
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.3'
+
+      - name: Jumpstart App
+        run: |
+          ./main.sh && echo "✅ Aplication has launched successfully" || echo "❌ Fatal Error"
+        shell: bash
