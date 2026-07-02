@@ -32,13 +32,13 @@ def create_dict(file_path: str) -> Dict[str, tuple[str, int]]:
             except ValueError:
                 continue
 
-            pattern = r"\*\*([^*]+)\*\*\s*[\-–—]\s*([^_]+?)(?:\s*(_)|$)"
+            pattern = r"\.\s*(?:_(.+)_)?.+\*\*([^*]+)\*\*\s*[\-–—]\s*(.+?)$"
 
             match = re.search(pattern, line)
             if match:
-                english = match.group(1)
-                russian = match.group(2).strip()
-                bracket_part = match.group(3)
+                bracket_part = match.group(1)
+                english = match.group(2).strip()
+                russian = match.group(3).strip()
 
                 if bracket_part:
                     bracket_match = re.search(r"_.*$", line)
@@ -79,7 +79,7 @@ def choose_mode() -> int:
             raise ValueError("Unknown mode for Game")
 
 
-def choose_level() -> float:
+def choose_level() -> float | None:
     levels = {1: 0.0, 2: 4.0, 3: 2.0, 4: 1.0, 5: 0.5, 6: -1}
 
     print("\n == All Modes ==\n")
@@ -117,7 +117,7 @@ def run_game(mode: int, speed: float, eng_dict: Dict, filepath: str) -> None:
     print("\n == Game Over ==")
     print(f"Result: {result * 100 //len(eng_dict)}% ({result} out of {len(eng_dict)})")
 
-    game_over_write(filepath, result)
+    game_over_write(filepath)
 
 
 def wait_for_non_q(speed: float):
@@ -243,7 +243,11 @@ def mark_known(filepath: str, number: int, f_count: int, u_count: int, known: bo
 
             stat_index = line.find("_(")
             if stat_index == -1:
-                line = line[:-1] + " _(🤯F - 0; 🧠U - 0)_\n"
+                line = (
+                    line[: len(str(number)) + 1]
+                    + " _(🤯F - 0; 🧠U - 0)_"
+                    + line[len(str(number)) + 1 :]
+                )
 
             if known:
                 line_with_stat = line.replace(
@@ -251,9 +255,7 @@ def mark_known(filepath: str, number: int, f_count: int, u_count: int, known: bo
                     f"_(🤯F - {f_count}; 🧠U - {u_count + 1})_",
                 )
                 if "🔥" not in line:
-                    new_line = line_with_stat.replace(
-                        f"{number}. **", f"{number}. 🔥**"
-                    )
+                    new_line = line_with_stat.replace(f")_ **", f")_ 🔥**")
                     print_green("studied")
                 else:
                     new_line = line_with_stat
@@ -263,8 +265,12 @@ def mark_known(filepath: str, number: int, f_count: int, u_count: int, known: bo
                     f"_(🤯F - {f_count}; 🧠U - {u_count})_",
                     f"_(🤯F - {f_count + 1}; 🧠U - {u_count})_",
                 )
-                new_line = line_with_stat.replace(f"{number}. 🔥**", f"{number}. **")
-                print_blue("forgot")
+                if "🔥" in line:
+                    new_line = line_with_stat.replace(f")_ 🔥**", f")_ **")
+                    print_blue("forgot")
+                else:
+                    new_line = line_with_stat
+                    print_blue("not know")
             new_lines.append(new_line)
         else:
             new_lines.append(line)
@@ -331,7 +337,7 @@ def add_new_words(filepath: str):
             number_new_word += 1
 
 
-def game_over_write(filepath: str, round_result: int):
+def game_over_write(filepath: str):
     template = {
         "The Number of page repetitions": 0,
         "Average page comprehension (%)": 0.0,
@@ -343,9 +349,10 @@ def game_over_write(filepath: str, round_result: int):
         content = file.read()
 
     understandable_words_count = content.count("🔥")
-    all_words = content.count("**") // 2 - 1
+    asterisks = content.count("**")
+    all_words = asterisks // 2 if asterisks % 2 == 0 else (asterisks - 1) // 2
 
-    stat_pattern = r"\*\*Statistic:\*\*.*?(?=\n\n|\Z|(?=\n\d+\.))"
+    stat_pattern = r"\*\*Statistic:.*?(?=\n\n|\Z|(?=\n\d+\.))"
     stat_match = re.search(stat_pattern, content, re.DOTALL)
 
     if stat_match:
@@ -370,7 +377,7 @@ def game_over_write(filepath: str, round_result: int):
     )
     template["The Number of 🧠 Understandable words"] = understandable_words_count
 
-    new_stat_block = "**Statistic:**\n"
+    new_stat_block = "**Statistic:\n"
     for key, value in template.items():
         new_stat_block += f"- _{key}: {value}\n"
     new_stat_block += "\n"
