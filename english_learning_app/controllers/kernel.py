@@ -102,7 +102,7 @@ def choose_level() -> float | None:
             raise ValueError("Unknown level for Game")
 
 
-def run_game(mode: int, speed: float, eng_dict: Dict, filepath: str) -> None:
+def run_game(mode: int, speed: float, eng_dict: Dict, filepath: str) -> int:
 
     print("\nStart The Process")
     print(20 * "-")
@@ -118,6 +118,8 @@ def run_game(mode: int, speed: float, eng_dict: Dict, filepath: str) -> None:
     print(f"Result: {result * 100 //len(eng_dict)}% ({result} out of {len(eng_dict)})")
 
     game_over_write(filepath)
+
+    return result
 
 
 def wait_for_non_q(speed: float):
@@ -385,3 +387,27 @@ def game_over_write(filepath: str):
     with open(filepath, "w", encoding="utf-8") as file:
         file.write(new_stat_block)
         file.write(content.lstrip())
+
+
+# Полностью сброс прогресса до нуля
+def reset_progress(path_dir: str) -> None:
+    paths = []
+    for root, dirs, files in os.walk(path_dir):
+        for file in files:
+            paths.append(os.path.join(root, file))
+
+    for path in paths:
+        with open(path, "r") as file:
+            content = ""
+            for line in file:
+                if line.find("🔥") == -1:
+                    content += line
+                    continue
+
+                line_without_fire = line.replace("🔥", "")
+                content += line_without_fire
+
+        with open(path, "w") as file:
+            file.write(content)
+
+    return None
