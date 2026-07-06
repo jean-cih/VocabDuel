@@ -79,11 +79,12 @@ def fetch_data_from_dict(path: str) -> str:
     index_series = 0
     content = ""
     invisible_data = ""
-    for _, graph_value in knowledge_statistics.items():
+    sum_of_cards = 0
+    for graph, graph_value in knowledge_statistics.items():
         for key, value in graph_value.items():
 
             if key == "title":
-                content += f"### {value}\n```chart\n"
+                content += f"\n### {value}\n```chart\n"
                 continue
             if not isinstance(value, dict):
                 content += f"{key}: {value}\n"
@@ -94,13 +95,17 @@ def fetch_data_from_dict(path: str) -> str:
                     content += f"{subkey}: {subvalue}\n"
                     if subkey == "    data":
                         invisible_data += f"{subkey}&{str(subvalue)[1:-1]}&"
+                        if graph == "graph1":
+                            sum_of_cards = sum(subvalue)
 
         content += "```\n"
         index_series = len(content)
 
-        content += f"> [!{invisible_data}!] Graphs data\n"
+        if graph != "graph3":
+            content += f"> [!{invisible_data}!] Graphs data\n"
         invisible_data = ""
 
+    content += f"\n**Total number of cards for all time: {sum_of_cards}**\n"
     content += f"\n**Setup Date: {find_date(path)[0]}**\n"
     content += f"\n_Last Entry: {date.today()}\n"
 
@@ -160,12 +165,46 @@ def add_current_level_in_dict(path_dir: str, path: str) -> None:
     return None
 
 
+def add_topics_in_dict(path: str):
+    # Добавление данных в массив эрудиции
+    knowledge_statistics["graph3"]["labels"] = sorted(
+        knowledge_statistics["graph3"]["labels"]
+    )
+    knowledge_statistics["graph3"]["series1"]["    data"] = []
+
+    for dir in sorted(knowledge_statistics["graph3"]["labels"]):
+        dir_path = os.path.join(path, dir[:-2].strip())
+
+        for root, dirs, files in os.walk(dir_path):
+            sum_f_words = 0
+            sum_u_words = 0
+            for file in files:
+                path_to_file = os.path.join(root, file)
+
+                with open(path_to_file, "r", encoding="utf-8") as f:
+                    for line in f:
+                        if line.find("Forgettable words") != -1:
+                            f_words = int(line.split(": ")[1])
+                            sum_f_words += f_words
+                        if line.find("Understandable words") != -1:
+                            u_words = int(line.split(": ")[1])
+                            sum_u_words += u_words
+
+            if sum_f_words == 0:
+                knowledge_statistics["graph3"]["series1"]["    data"].append(0)
+            else:
+                knowledge_statistics["graph3"]["series1"]["    data"].append(
+                    sum_u_words * 100 // (sum_u_words + sum_f_words)
+                )
+
+
 def draw_graph(cards: int, path_dir: str) -> None:
 
     fetch_data_from_file(path_graph)
 
     add_cards_in_dict(path_graph, cards)
     add_current_level_in_dict(path_dir, path_graph)
+    add_topics_in_dict(path_dir)
 
     content = fetch_data_from_dict(path_graph)
 
