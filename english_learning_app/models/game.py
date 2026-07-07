@@ -16,6 +16,9 @@ from english_learning_app.graphs import graps
 def main():
     path = "../../../mnt/c/Работа/MyBrainObsidian/personal-obsidian-vault/English/Dictionaries"
     try:
+        # graps.draw_graph(0, path)
+        # exit(1)
+
         # reset_progress(path)
         stat = load_game()
 
