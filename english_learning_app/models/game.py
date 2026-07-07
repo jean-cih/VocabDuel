@@ -3,6 +3,7 @@
 from english_learning_app.controllers.kernel import *
 from english_learning_app.static.display import *
 import traceback
+import argparse
 
 from english_learning_app.graphs import graps
 
@@ -16,27 +17,29 @@ from english_learning_app.graphs import graps
 def main():
     path = "../../../mnt/c/Работа/MyBrainObsidian/personal-obsidian-vault/English/Dictionaries"
     try:
-        # graps.draw_graph(0, path)
-        # exit(1)
-
         # reset_progress(path)
-        stat = load_game()
 
-        if stat == 3:
-            statistics_output(path)
-            return
+        parser = argparse.ArgumentParser(description="Game Parameters")
+
+        parser.add_argument("--mode", type=int, default=2, help="Game Mode")
+        parser.add_argument("--format", type=int, default=2, help="Translation format")
+        parser.add_argument("--speed", type=int, default=1, help="Game speed")
+
+        args = parser.parse_args()
+
+        load_preview()
 
         filepath = choose_file(path)
 
-        if stat == 1:
+        if args.mode == 1:
             add_new_words(filepath)
-        elif stat == 2:
+        elif args.mode == 2:
             eng_dict = create_dict(filepath)
-            mode = choose_mode()
-            speed = choose_level()
-            if speed == -1:
-                return
-            cards = run_game(mode, speed, eng_dict, filepath)
+            # mode = choose_mode()
+            # speed = choose_level()
+            # if speed == -1:
+            #     return
+            cards = run_game(args.format, args.speed, eng_dict, filepath)
 
             graps.draw_graph(cards, path)
 
