@@ -108,18 +108,18 @@ def run_game(mode: int, speed: float, eng_dict: Dict, filepath: str) -> int:
     print(20 * "-")
 
     used = set()
-    result = 0
-    if speed > 0:
-        result = run_time_game(mode, speed, eng_dict, used, filepath)
-    else:
-        result = run_control_game(mode, eng_dict, used, filepath)
+    # if speed > 0:
+    #     result = run_time_game(mode, speed, eng_dict, used, filepath)
+    # else:
+    result = run_control_game(mode, eng_dict, used, filepath)
 
     print("\n == Game Over ==")
-    print(f"Result: {result * 100 //len(eng_dict)}% ({result} out of {len(eng_dict)})")
+    all_words = sum(result)
+    print(f"Result: {result[0] * 100 // all_words}% ({result[0]} out of {all_words})")
 
     game_over_write(filepath)
 
-    return result
+    return all_words
 
 
 def wait_for_non_q(speed: float):
@@ -191,8 +191,10 @@ def run_time_game(
     return result
 
 
-def run_control_game(mode: int, created_dict: Dict, used: Set, filepath: str) -> int:
-    result = 0
+def run_control_game(
+    mode: int, created_dict: Dict, used: Set, filepath: str
+) -> tuple[int, int]:
+    known, unknowm = 0, 0
     while True:
         index = random.randint(0, len(created_dict) - 1)
         if index in used:
@@ -215,11 +217,12 @@ def run_control_game(mode: int, created_dict: Dict, used: Set, filepath: str) ->
         symbol = input().strip()
         if symbol == "":
             mark_known(filepath, number, forgettable, understandable, True)
-            result += 1
+            known += 1
         elif symbol == "q":
             break
         else:
             mark_known(filepath, number, forgettable, understandable, False)
+            unknowm += 1
 
         if len(used) % 10 == 0:
             print(f" == {len(used) * 100 // len(created_dict)}% completed ==\n")
@@ -229,7 +232,7 @@ def run_control_game(mode: int, created_dict: Dict, used: Set, filepath: str) ->
 
         time.sleep(1.0)
 
-    return result
+    return known, unknowm
 
 
 def mark_known(filepath: str, number: int, f_count: int, u_count: int, known: bool):
@@ -331,10 +334,10 @@ def add_new_words(filepath: str):
             )
 
             if new_word == "q" or new_translate == "q":
-                file.write("---\n")
+                file.write("\n---")
                 break
 
-            file.write(f"{number_new_word}. **{new_word}** - {new_translate}\n")
+            file.write(f"\n{number_new_word}. **{new_word}** - {new_translate}")
             print_green(f"{new_word} was added")
             number_new_word += 1
 
