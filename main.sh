@@ -17,4 +17,4 @@
 #      REVISION:  ---
 #===============================================================================
 
-python3 -m english_learning_app.models.game
+python3 -m english_learning_app.models.game --mode 2 --format 2 --speed 1

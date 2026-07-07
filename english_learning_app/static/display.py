@@ -2,7 +2,7 @@ import time
 import os
 
 
-def load_game() -> int:
+def load_preview():
 
     print("\n === The English Game ===\n")
 
@@ -15,17 +15,17 @@ def load_game() -> int:
         )
         time.sleep(2)
 
-    choose_option("\n I can offer you something:\n")
-
-    try:
-        while True:
-            option = int(input(" What do You want: ").strip())
-            if option not in [1, 2, 3]:
-                print_yellow("Please, tap option from the ragne 1, 2, 3")
-                continue
-            return option
-    except:
-        raise ValueError("Unknown option for This Game")
+    # choose_option("\n I can offer you something:\n")
+    #
+    # try:
+    #     while True:
+    #         option = int(input(" What do You want: ").strip())
+    #         if option not in [1, 2]:
+    #             print_yellow("Please, tap option from the ragne 1, 2")
+    #             continue
+    #         return option
+    # except:
+    #     raise ValueError("Unknown option for This Game")
 
 
 def typing(text: str, delay: float):
@@ -60,35 +60,6 @@ def choose_option(text: str):
     typing(text, 0)
     print(" 1. Top-up")
     print(" 2. Practice")
-    print(" 3. Progress")
-
-
-def statistics_output(folder_path: str) -> None:
-    print("\n\n == Statistics ==\n")
-
-    paths = []
-    for root, dirs, files in os.walk(folder_path):
-        for file in files:
-            paths.append(os.path.join(root, file))
-
-    # Нет защиты от уникальных слов
-    all_known_words = 0
-    all_unknown_words = 0
-    for path in paths:
-        with open(path, "r") as file:
-            for line in file:
-                index_spot = line.find(".")
-                if index_spot == -1:
-                    continue
-                index = line.find("🔥")
-                if index >= 0:
-                    all_known_words += 1
-                else:
-                    all_unknown_words += 1
-
-    print(f"All known words: {all_known_words}")
-    print(f"All unknown words: {all_unknown_words}")
-    print(f"Total words: {all_known_words + all_unknown_words}\n")
 
 
 def print_green(text: str):
