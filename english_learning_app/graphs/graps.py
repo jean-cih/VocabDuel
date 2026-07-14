@@ -55,11 +55,12 @@ def fetch_data_from_file(path: str) -> None:
     return None
 
 
-def add_cards_in_dict(cards: int):
+def add_cards_in_dict(path: str, cards: int) -> int:
     # Добавление данных в словари
-    days_after_last_entry = get_difference_between_days(
-        knowledge_statistics["Last Entry"]
-    )
+    last_entry = find_date(path, "Last Entry")
+
+    days_after_last_entry = get_difference_between_days(last_entry.strip())
+
     if days_after_last_entry > 0:
         # Добавляем
         del knowledge_statistics["graph1"][1]["series1"]["    data"][-1]
@@ -73,6 +74,8 @@ def add_cards_in_dict(cards: int):
     knowledge_statistics["Total number of cards for all time"] = sum(
         knowledge_statistics["graph1"][1]["series1"]["    data"]
     )
+
+    return days_after_last_entry
 
 
 def fetch_data_from_dict() -> str:
@@ -153,22 +156,23 @@ def get_unique_number_words(path_dir: str) -> tuple[int, int]:
     return len(unique_words), len(unique_known_words)
 
 
-def add_current_level_in_dict(unique_words: int, known_words: int) -> None:
+def add_current_level_in_dict(
+    unique_words: int, known_words: int, days_last_entry: int
+) -> None:
     knowledge_statistics["Total number of all words"] = unique_words
     knowledge_statistics["Total number of known words"] = f"{known_words}🔥"
 
-    days_after_setup = get_difference_between_days(knowledge_statistics["Last Entry"])
-    if days_after_setup > 0:
+    if days_last_entry > 0:
         # Добавляем
         del knowledge_statistics["graph2"][1]["series1"]["    data"][-1]
         knowledge_statistics["graph2"][1]["series1"]["    data"] += [
             knowledge_statistics["graph2"][1]["series1"]["    data"][-1]
-        ] * (days_after_setup - 1) + [unique_words - known_words, 0]
+        ] * (days_last_entry - 1) + [unique_words - known_words, 0]
 
         del knowledge_statistics["graph2"][1]["series2"]["    data"][-1]
         knowledge_statistics["graph2"][1]["series2"]["    data"] += [
             knowledge_statistics["graph2"][1]["series2"]["    data"][-1]
-        ] * (days_after_setup - 1) + [known_words, 0]
+        ] * (days_last_entry - 1) + [known_words, 0]
     else:
         # Переписываем
         knowledge_statistics["graph2"][1]["series1"]["    data"][-2] = (
@@ -216,10 +220,10 @@ def draw_graph(cards: int, path_dir: str) -> None:
 
     fetch_data_from_file(path_graph)
 
-    add_cards_in_dict(cards)
+    days_entry = add_cards_in_dict(path_graph, cards)
 
     unique_words, known_words = get_unique_number_words(path_dir)
-    add_current_level_in_dict(unique_words, known_words)
+    add_current_level_in_dict(unique_words, known_words, days_entry)
 
     add_topics_in_dict(path_dir)
 

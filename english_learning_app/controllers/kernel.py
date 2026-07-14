@@ -343,7 +343,6 @@ def add_new_words(filepath: str):
             print_green(f"{new_word} was added")
 
 
-
 def game_over_write(filepath: str):
     template = {
         "The Number of page repetitions": 0,
