@@ -15,7 +15,6 @@ from english_learning_app.graphs import graps
 
 
 def main():
-    path = "../../../mnt/c/Работа/MyBrainObsidian/personal-obsidian-vault/English/Dictionaries"
     try:
         # reset_progress(path)
 
@@ -24,12 +23,15 @@ def main():
         parser.add_argument("--mode", type=int, default=2, help="Game Mode")
         parser.add_argument("--format", type=int, default=2, help="Translation format")
         parser.add_argument("--speed", type=int, default=1, help="Game speed")
+        parser.add_argument(
+            "--path", type=str, help="Path to folder with English dicts"
+        )
 
         args = parser.parse_args()
 
         load_preview()
 
-        filepath = choose_file(path)
+        filepath = choose_file(args.path)
 
         if args.mode == 1:
             add_new_words(filepath)
@@ -41,7 +43,7 @@ def main():
             #     return
             cards = run_game(args.format, args.speed, eng_dict, filepath)
 
-            graps.draw_graph(cards, path)
+            graps.draw_graph(cards, args.path)
 
     except Exception as e:
         print_red(f"Error: {traceback.format_exc()}")
