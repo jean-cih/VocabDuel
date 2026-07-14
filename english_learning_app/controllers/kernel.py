@@ -317,9 +317,7 @@ def add_new_words(filepath: str):
     number_new_word = 1
     with open(filepath, "r") as file:
         for line in file:
-            index_spot = line.find(".")
-
-            if index_spot >= 0:
+            if re.match(r"\d+\.", line):
                 number_new_word += 1
 
     print("\n - Tap q to exit -")
@@ -334,12 +332,16 @@ def add_new_words(filepath: str):
             )
 
             if new_word == "q" or new_translate == "q":
-                file.write("\n---")
+                file.write(" \n---")
                 break
 
-            file.write(f"\n{number_new_word}. **{new_word}** - {new_translate}")
-            print_green(f"{new_word} was added")
+            if new_word == "wl" or new_translate == "wl":
+                break
+
             number_new_word += 1
+            file.write(f" \n{number_new_word}. **{new_word}** - {new_translate}")
+            print_green(f"{new_word} was added")
+
 
 
 def game_over_write(filepath: str):

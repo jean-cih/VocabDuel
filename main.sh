@@ -19,4 +19,4 @@
 
 PATH_TO_DIR="../../../mnt/c/Работа/MyBrainObsidian/personal-obsidian-vault/English/Dictionaries"
 
-python3 -m english_learning_app.models.game --mode 1 --format 2 --speed 1 --path "$PATH_TO_DIR"
+python3 -m english_learning_app.models.game --mode $1 --format 2 --speed 1 --path "$PATH_TO_DIR"

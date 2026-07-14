@@ -37,10 +37,6 @@ def fetch_data_from_file(path: str) -> None:
 
     days_after_setup = get_difference_between_days(knowledge_statistics["Setup Date"])
 
-    entry_date = find_date(path, "Last Entry")
-    if entry_date:
-        knowledge_statistics["Last Entry"] = entry_date.strip()
-
     with open(path, "r", encoding="utf-8") as file:
         markdown_text = file.read()
 
