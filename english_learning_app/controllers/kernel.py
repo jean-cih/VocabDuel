@@ -294,10 +294,15 @@ def choose_file(folder_path: str) -> str:
     paths = []
     num = 1
     for root, dirs, files in os.walk(folder_path):
-        for file in files:
-            print(f"{num}. {file}")
-            paths.append(os.path.join(root, file))
-            num += 1
+        for direct in dirs:
+            print(f"\n== {direct} ==")
+            dir_path = os.path.join(root, direct)
+            for file in os.listdir(dir_path):
+                full_path = os.path.join(dir_path, file)
+                if os.path.isfile(full_path):
+                    print(f"{num}. {file}")
+                    paths.append(full_path)
+                    num += 1
 
     try:
         while True:
