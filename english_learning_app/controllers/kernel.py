@@ -17,47 +17,58 @@ def create_dict(file_path: str) -> Dict[str, tuple[str, int]]:
     )
 
     eng_dict = {}
-    with open(file_path, "r", encoding="utf-8") as file:
-        for line in file:
 
-            if option == 2 and "🔥" in line:
-                continue
+    paths = []
+    if os.path.isdir(file_path):
+        for file in os.listdir(file_path):
+            full_path = os.path.join(file_path, file)
+            if os.path.isfile(full_path):
+                paths.append(full_path)
+    else:
+        paths.append(file_path)
 
-            index = line.find(".")
-            if index == -1:
-                continue
+    for path in paths:
+        with open(path, "r", encoding="utf-8") as file:
+            for line in file:
 
-            try:
-                number = int(line[:index].strip())
-            except ValueError:
-                continue
+                if option == 2 and "🔥" in line:
+                    continue
 
-            pattern = r"\.\s*(?:_(.+)_)?.+\*\*([^*]+)\*\*\s*[\-–—]\s*(.+?)$"
+                index = line.find(".")
+                if index == -1:
+                    continue
 
-            match = re.search(pattern, line)
-            if match:
-                bracket_part = match.group(1)
-                english = match.group(2).strip()
-                russian = match.group(3).strip()
+                try:
+                    number = int(line[:index].strip())
+                except ValueError:
+                    continue
 
-                if bracket_part:
-                    bracket_match = re.search(r"_.*$", line)
-                    bracket_full = bracket_match.group(0) if bracket_match else ""
+                pattern = r"\.\s*(?:_(.+)_)?.+\*\*([^*]+)\*\*\s*[\-–—]\s*(.+?)$"
 
-                    numbers = bracket_full.split(";")
-                    f_index = numbers[0].find("- ") + 2
+                match = re.search(pattern, line)
+                if match:
+                    bracket_part = match.group(1)
+                    english = match.group(2).strip()
+                    russian = match.group(3).strip()
 
-                    u_index = numbers[1].find("- ") + 2
-                    u_end_index = numbers[1].find(")_")
+                    if bracket_part:
+                        bracket_match = re.search(r"_.*$", line)
+                        bracket_full = bracket_match.group(0) if bracket_match else ""
 
-                    eng_dict[english] = (
-                        russian,
-                        number,
-                        int(numbers[0][f_index:]),
-                        int(numbers[1][u_index:u_end_index]),
-                    )
-                else:
-                    eng_dict[english] = (russian, number, 0, 0)
+                        numbers = bracket_full.split(";")
+                        f_index = numbers[0].find("- ") + 2
+
+                        u_index = numbers[1].find("- ") + 2
+                        u_end_index = numbers[1].find(")_")
+
+                        eng_dict[english] = (
+                            russian,
+                            number,
+                            int(numbers[0][f_index:]),
+                            int(numbers[1][u_index:u_end_index]),
+                        )
+                    else:
+                        eng_dict[english] = (russian, number, 0, 0)
 
     return eng_dict
 
@@ -102,22 +113,23 @@ def choose_level() -> float | None:
             raise ValueError("Unknown level for Game")
 
 
-def run_game(mode: int, speed: float, eng_dict: Dict, filepath: str) -> int:
+def run_game(mode: int, speed: float, eng_dict: Dict, filepath: str, flag: str) -> int:
 
-    print("\nStart The Process")
+    print(f"\nStart The Process: {len(eng_dict)} words")
     print(20 * "-")
 
     used = set()
     # if speed > 0:
     #     result = run_time_game(mode, speed, eng_dict, used, filepath)
     # else:
-    result = run_control_game(mode, eng_dict, used, filepath)
+    result = run_control_game(mode, eng_dict, used, filepath, flag)
 
     print("\n == Game Over ==")
     all_words = sum(result)
     print(f"Result: {result[0] * 100 // all_words}% ({result[0]} out of {all_words})")
 
-    game_over_write(filepath)
+    if flag != "1":
+        game_over_write(filepath)
 
     return all_words
 
@@ -192,7 +204,7 @@ def run_time_game(
 
 
 def run_control_game(
-    mode: int, created_dict: Dict, used: Set, filepath: str
+    mode: int, created_dict: Dict, used: Set, filepath: str, flag: str
 ) -> tuple[int, int]:
     known, unknowm = 0, 0
     while True:
@@ -216,12 +228,18 @@ def run_control_game(
         print("Translate: ", translate.strip(), end=" ")
         symbol = input().strip()
         if symbol == "":
-            mark_known(filepath, number, forgettable, understandable, True)
+            if flag != "1":
+                mark_known(filepath, number, forgettable, understandable, True)
+            else:
+                print_green("studied")
             known += 1
         elif symbol == "q":
             break
         else:
-            mark_known(filepath, number, forgettable, understandable, False)
+            if flag != "1":
+                mark_known(filepath, number, forgettable, understandable, False)
+            else:
+                print_blue("not know")
             unknowm += 1
 
         if len(used) % 10 == 0:
@@ -236,6 +254,7 @@ def run_control_game(
 
 
 def mark_known(filepath: str, number: int, f_count: int, u_count: int, known: bool):
+
     with open(filepath, "r", encoding="utf-8") as file:
         lines = file.readlines()
 
@@ -285,6 +304,32 @@ def mark_known(filepath: str, number: int, f_count: int, u_count: int, known: bo
 
     with open(filepath, "w", encoding="utf-8") as file:
         file.writelines(new_lines)
+
+
+def choose_category(folder_path: str) -> str | None:
+    print("\n == All Awailable Dictionaries ==\n")
+
+    paths = []
+    num = 1
+    for root, dirs, files in os.walk(folder_path):
+        for direct in dirs:
+            dir_path = os.path.join(root, direct)
+            if os.path.isdir(dir_path):
+                print(f"{num}. {direct}")
+                paths.append(dir_path)
+                num += 1
+
+    try:
+        while True:
+            index_file = int(input(" Choose The Theme: ").strip())
+            if index_file not in list(range(1, num)):
+                print_yellow(
+                    f"Please, enter the number from the range {list(range(1, num))}"
+                )
+                continue
+            return paths[index_file - 1]
+    except:
+        raise ValueError("Unknown file's number")
 
 
 def choose_file(folder_path: str) -> str:

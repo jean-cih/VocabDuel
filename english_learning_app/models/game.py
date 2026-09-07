@@ -31,7 +31,15 @@ def main():
 
         load_preview()
 
-        filepath = choose_file(args.path)
+        flag = input(
+            "Do you wanna check the whole category or a separate list? (1 | 2) "
+        )
+
+        filepath = ""
+        if flag == "1":
+            filepath = choose_category(args.path)
+        else:
+            filepath = choose_file(args.path)
 
         if args.mode == 1:
             add_new_words(filepath)
@@ -41,7 +49,7 @@ def main():
             # speed = choose_level()
             # if speed == -1:
             #     return
-            cards = run_game(args.format, args.speed, eng_dict, filepath)
+            cards = run_game(args.format, args.speed, eng_dict, filepath, flag)
 
             graps.draw_graph(cards, args.path)
 

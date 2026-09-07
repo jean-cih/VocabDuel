@@ -118,7 +118,7 @@ def get_all_dicts_paths(path_dir: str) -> list[str]:
     return paths
 
 
-def get_number_words(path_dir: str) -> tuple[int, int]:
+def get_number_phrases(path_dir: str) -> tuple[int, int]:
     paths = get_all_dicts_paths(path_dir)
 
     all_known_words = 0
@@ -137,7 +137,7 @@ def get_number_words(path_dir: str) -> tuple[int, int]:
     return all_known_words, all_unknown_words
 
 
-def get_unique_number_words(path_dir: str) -> tuple[int, int]:
+def get_unique_number_phrases(path_dir: str) -> tuple[int, int]:
     paths = get_all_dicts_paths(path_dir)
 
     unique_words = set()
@@ -154,6 +154,24 @@ def get_unique_number_words(path_dir: str) -> tuple[int, int]:
                         unique_known_words.add(eng_word.group(1))
 
     return len(unique_words), len(unique_known_words)
+
+
+def get_unique_number_words(path_dir: str) -> int:
+    paths = get_all_dicts_paths(path_dir)
+
+    unique_words = set()
+    for path in paths:
+        with open(path, "r", encoding="utf-8") as file:
+            for line in file:
+                if not re.match(r"\d+\.", line):
+                    continue
+                eng_words = re.search(r"[ 🔥]\*\*([^*]+)\*\*", line)
+                if eng_words is not None:
+                    eng_phrase = eng_words.group(1).strip()
+                    eng_list_words = [x.lower() for x in eng_phrase.split()]
+                    unique_words.update(eng_list_words)
+
+    return len(unique_words)
 
 
 def add_current_level_in_dict(
@@ -222,11 +240,13 @@ def draw_graph(cards: int, path_dir: str) -> None:
 
     days_entry = add_cards_in_dict(path_graph, cards)
 
-    unique_words, known_words = get_unique_number_words(path_dir)
-    add_current_level_in_dict(unique_words, known_words, days_entry)
+    unique_phrases, known_phrases = get_unique_number_phrases(path_dir)
+    add_current_level_in_dict(unique_phrases, known_phrases, days_entry)
 
     add_topics_in_dict(path_dir)
 
     content = fetch_data_from_dict()
 
     write_to_file(path_graph, content)
+
+    print(get_unique_number_words(path_dir))
