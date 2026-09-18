@@ -1,4 +1,4 @@
-from typing import Dict, Set
+from typing import Dict, Set, List
 import re
 import sys
 import tty
@@ -11,21 +11,27 @@ import os
 from english_learning_app.static.display import *
 
 
-def create_dict(file_path: str) -> Dict[str, tuple[str, int]]:
+def create_list_paths(path: str) -> List[str]:
+    paths = []
+    if os.path.isdir(path):
+        for file in os.listdir(path):
+            full_path = os.path.join(path, file)
+            if os.path.isfile(full_path):
+                paths.append(full_path)
+    else:
+        paths.append(path)
+
+    return paths
+
+
+def create_dict(path: str) -> Dict[str, tuple[str, int]]:
     option = int(
         input("Do you wanna learn all or only unknown words? (1 | 2) ").strip()
     )
 
-    eng_dict = {}
+    paths = create_list_paths(path)
 
-    paths = []
-    if os.path.isdir(file_path):
-        for file in os.listdir(file_path):
-            full_path = os.path.join(file_path, file)
-            if os.path.isfile(full_path):
-                paths.append(full_path)
-    else:
-        paths.append(file_path)
+    eng_dict = {}
 
     for path in paths:
         with open(path, "r", encoding="utf-8") as file:
@@ -113,7 +119,7 @@ def choose_level() -> float | None:
             raise ValueError("Unknown level for Game")
 
 
-def run_game(mode: int, speed: float, eng_dict: Dict, filepath: str, flag: str) -> int:
+def run_game(mode: int, speed: float, eng_dict: Dict, filepath: str, flag: int) -> int:
 
     print(f"\nStart The Process: {len(eng_dict)} words")
     print(20 * "-")
@@ -204,7 +210,7 @@ def run_time_game(
 
 
 def run_control_game(
-    mode: int, created_dict: Dict, used: Set, filepath: str, flag: str
+    mode: int, created_dict: Dict, used: Set, filepath: str, flag: int
 ) -> tuple[int, int]:
     known, unknowm = 0, 0
     while True:
@@ -307,7 +313,7 @@ def mark_known(filepath: str, number: int, f_count: int, u_count: int, known: bo
 
 
 def choose_category(folder_path: str) -> str | None:
-    print("\n == All Awailable Dictionaries ==\n")
+    print("\n == All Available Categories ==\n")
 
     paths = []
     num = 1
@@ -332,22 +338,18 @@ def choose_category(folder_path: str) -> str | None:
         raise ValueError("Unknown file's number")
 
 
-def choose_file(folder_path: str) -> str:
+def choose_file(dir_path: str) -> str | None:
 
-    print("\n == All Awailable Dictionaries ==\n")
+    print("\n == All Available Dictionaries ==\n")
 
     paths = []
     num = 1
-    for root, dirs, files in os.walk(folder_path):
-        for direct in dirs:
-            print(f"\n== {direct} ==")
-            dir_path = os.path.join(root, direct)
-            for file in os.listdir(dir_path):
-                full_path = os.path.join(dir_path, file)
-                if os.path.isfile(full_path):
-                    print(f"{num}. {file}")
-                    paths.append(full_path)
-                    num += 1
+    for file in os.listdir(dir_path):
+        full_path = os.path.join(dir_path, file)
+        if os.path.isfile(full_path):
+            print(f"{num}. {file}")
+            paths.append(full_path)
+            num += 1
 
     try:
         while True:

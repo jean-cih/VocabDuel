@@ -31,15 +31,15 @@ def main():
 
         load_preview()
 
-        flag = input(
-            "Do you wanna check the whole category or a separate list? (1 | 2) "
+        flag = int(
+            input(
+                "\nDo you wanna check the whole category or a separate list? (1 | 2) "
+            ).strip()
         )
 
-        filepath = ""
-        if flag == "1":
-            filepath = choose_category(args.path)
-        else:
-            filepath = choose_file(args.path)
+        dir_path = choose_category(args.path)
+
+        filepath = dir_path if flag == 1 else choose_file(dir_path)
 
         if args.mode == 1:
             add_new_words(filepath)
