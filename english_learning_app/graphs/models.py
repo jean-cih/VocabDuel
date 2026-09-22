@@ -37,25 +37,7 @@ knowledge_statistics = {
         "Progress on Topics",
         {
             "type": "line",
-            "labels": [
-                "Movies 🎬",
-                "Travel ✈️",
-                "Food 🍕",
-                "Music 🎵",
-                "Work 💼",
-                "Family ❤️",
-                "Health 🏥",
-                "Weather ☀️",
-                "Clothes 👗",
-                "Sport ⚽",
-                "Technology 💻",
-                "House 🏠",
-                "Animal 🐶",
-                "Body 💪",
-                "Writing ✍️",
-                "Speaking & Expressions 🗣️",
-                "Books 📚",
-            ],  # Различные темы
+            "labels": [],  # Различные темы
             "series1": {
                 "  - label": "(%)",
                 "    data": [],  # Процент понимания темы
