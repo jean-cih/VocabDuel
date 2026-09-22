@@ -208,10 +208,17 @@ def add_topics_in_dict(path: str):
     )
     knowledge_statistics["graph3"][1]["series1"]["    data"] = []
 
-    for dir in sorted(knowledge_statistics["graph3"][1]["labels"]):
-        dir_path = os.path.join(path, dir[:-2].strip())
+    dir_paths = []
+    for root, dirs, files in os.walk(path):
+        for direct in dirs:
+            dir_path = os.path.join(root, direct)
+            if os.path.isdir(dir_path):
+                knowledge_statistics["graph3"][1]["labels"].append(direct)
+                dir_paths.append(dir_path)
 
-        for root, dirs, files in os.walk(dir_path):
+    for dir in dir_paths:
+
+        for root, dirs, files in os.walk(dir):
             sum_f_words = 0
             sum_u_words = 0
             for file in files:
