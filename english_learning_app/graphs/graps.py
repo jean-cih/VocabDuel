@@ -233,7 +233,7 @@ def add_topics_in_dict(path: str):
                             u_words = int(line.split(": ")[1])
                             sum_u_words += u_words
 
-            if sum_f_words == 0:
+            if sum_f_words + sum_u_words == 0:
                 knowledge_statistics["graph3"][1]["series1"]["    data"].append(0)
             else:
                 knowledge_statistics["graph3"][1]["series1"]["    data"].append(

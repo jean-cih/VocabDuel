@@ -134,7 +134,7 @@ def run_game(mode: int, speed: float, eng_dict: Dict, filepath: str, flag: int) 
     all_words = sum(result)
     print(f"Result: {result[0] * 100 // all_words}% ({result[0]} out of {all_words})")
 
-    if flag != "1":
+    if flag != 1:
         game_over_write(filepath)
 
     return all_words
@@ -234,7 +234,7 @@ def run_control_game(
         print("Translate: ", translate.strip(), end=" ")
         symbol = input().strip()
         if symbol == "":
-            if flag != "1":
+            if flag != 1:
                 mark_known(filepath, number, forgettable, understandable, True)
             else:
                 print_green("studied")
@@ -242,7 +242,7 @@ def run_control_game(
         elif symbol == "q":
             break
         else:
-            if flag != "1":
+            if flag != 1:
                 mark_known(filepath, number, forgettable, understandable, False)
             else:
                 print_blue("not know")
