@@ -248,6 +248,9 @@ def run_control_game(
                 print_blue("not know")
             unknowm += 1
 
+            with open("forgotten.md", "a", encoding="utf-8") as file:
+                file.write(f"{translate.strip()} - {word.strip()}\n")
+
         if len(used) % 10 == 0:
             print(f" == {len(used) * 100 // len(created_dict)}% completed ==\n")
 
@@ -301,6 +304,7 @@ def mark_known(filepath: str, number: int, f_count: int, u_count: int, known: bo
                 else:
                     new_line = line_with_stat
                     print_blue("not know")
+
             new_lines.append(new_line)
         else:
             new_lines.append(line)
