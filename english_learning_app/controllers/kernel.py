@@ -248,8 +248,8 @@ def run_control_game(
                 print_blue("not know")
             unknowm += 1
 
-            with open("forgotten.md", "a", encoding="utf-8") as file:
-                file.write(f"{translate.strip()} - {word.strip()}\n")
+            with open("forgotten.tsv", "a", encoding="utf-8") as file:
+                file.write(f"{translate.strip()}\t{word.strip()}\n")
 
         if len(used) % 10 == 0:
             print(f" == {len(used) * 100 // len(created_dict)}% completed ==\n")
