@@ -4,6 +4,7 @@ from english_learning_app.controllers.kernel import *
 from english_learning_app.static.display import *
 import traceback
 import argparse
+import re
 
 from english_learning_app.graphs import graps
 
@@ -26,10 +27,30 @@ def main():
         parser.add_argument(
             "--path", type=str, help="Path to folder with English dicts"
         )
+        parser.add_argument(
+            "--path_forgotten",
+            type=str,
+            help="Path to folder with English Forgotten words",
+        )
 
         args = parser.parse_args()
 
         load_preview()
+
+        if args.mode == 3:
+            eng_dict = create_dict(args.path_forgotten)
+
+            if len(eng_dict) <= 0:
+                print("There are not Forgotten words")
+                return
+
+            cards = run_game(args.format, args.speed, eng_dict, args.path_forgotten, 2)
+
+            graps.draw_graph(cards, args.path)
+
+            delete_known_words(args.path_forgotten)
+
+            return
 
         flag = int(
             input(
@@ -55,6 +76,22 @@ def main():
 
     except Exception as e:
         print_red(f"Error: {traceback.format_exc()}")
+
+
+def delete_known_words(filepath: str):
+    with open(filepath, "r", encoding="utf-8") as file:
+        lines = file.readlines()
+
+    result_lines = []
+
+    pattern = r"\(🤯F\s*-\s*(\d+);\s*🧠U\s*-\s*(\d+)\)"
+    for line in lines:
+        match = re.search(pattern, line)
+        if match and int(match.group(2)) - int(match.group(1)) < 2:
+            result_lines.append(line)
+
+    with open(filepath, "w", encoding="utf-8") as file:
+        file.writelines(result_lines)
 
 
 if __name__ == "__main__":
