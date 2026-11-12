@@ -19,4 +19,6 @@
 
 PATH_TO_DIR="../../../mnt/c/Работа/MyBrainObsidian/personal-obsidian-vault/English/Dictionaries"
 
-python3 -m english_learning_app.models.game --mode $1 --format 2 --speed 1 --path "$PATH_TO_DIR"
+PATH_TO_FORGOTTEN="../../../mnt/c/Работа/MyBrainObsidian/personal-obsidian-vault/English/Forgotten/Forgotten.md"
+
+python3 -m english_learning_app.models.game --mode $1 --format 2 --speed 1 --path "$PATH_TO_DIR" --path_forgotten "$PATH_TO_FORGOTTEN"
