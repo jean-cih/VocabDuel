@@ -22,7 +22,6 @@ APP_SALT="your_app_secret_salt"
 HASHED_ID=$(echo -n "${APP_SALT}${MACHINE_ID}" | sha256sum | cut -d' ' -f1)
 HASH=$(cat key.txt)
 
-
 PATH_TO_APP=""
 if [[ "$HASHED_ID" == "$HASH" ]];
 then

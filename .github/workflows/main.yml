@@ -38,5 +38,5 @@ jobs:
 
       - name: Jumpstart App
         run: |
-          ./main.sh && echo "✅ Aplication has launched successfully" || echo "❌ Fatal Error"
+          ./main.sh 2 && echo "✅ Aplication has launched successfully" || echo "❌ Fatal Error"
         shell: bash
