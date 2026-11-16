@@ -1,0 +1,6 @@
+from typing import Protocol
+
+
+class Terminal(Protocol):
+    def wait_key(self, timeout: float) -> str | None: ...
+    def read_line(self, prompt: str = "") -> str: ...

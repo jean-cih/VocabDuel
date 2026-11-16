@@ -31,3 +31,6 @@ Thumbs.db
 *.pyo
 .pytest_cache/
 .coverage
+
+# key for system
+key.txt
