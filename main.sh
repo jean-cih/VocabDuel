@@ -28,7 +28,6 @@ then
 PATH_TO_APP="../../../mnt/c/Работа/MyBrainObsidian/personal-obsidian-vault/English/MyEnglishApp/"
 else
   echo "Change App Path"
-  exit 1
 fi
 
 PATH_TO_DICTS="${PATH_TO_APP}Dictionaries/"

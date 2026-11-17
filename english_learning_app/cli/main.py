@@ -39,43 +39,43 @@ def create_path_to_dict(path: str, mode: int) -> str:
 
 
 def main() -> None:
-    # try:
-    args = build_parser().parse_args()
+    try:
+        args = build_parser().parse_args()
 
-    dict_repo = MarkdownDictRepository()
-    stats_repo = MarkdownStatsRepository()
-    terminal = PosixTerminal()
+        dict_repo = MarkdownDictRepository()
+        stats_repo = MarkdownStatsRepository()
+        terminal = PosixTerminal()
 
-    display.load_preview()
+        display.load_preview()
 
-    cards = unknown = known = max_words = 0
-    topic = ""
-    if args.mode == 1:
-        filepath = create_path_to_dict(args.path, args.mode)
-        add_words(dict_repo, terminal, filepath)
-    elif args.mode == 2:
-        filepath = create_path_to_dict(args.path, args.mode)
-        cards, known, unknown, topic, max_words = play_session(
-            dict_repo, terminal, args.speed, filepath
+        cards = unknown = known = max_words = 0
+        topic = ""
+        if args.mode == 1:
+            filepath = create_path_to_dict(args.path, args.mode)
+            add_words(dict_repo, terminal, filepath)
+        elif args.mode == 2:
+            filepath = create_path_to_dict(args.path, args.mode)
+            cards, known, unknown, topic, max_words = play_session(
+                dict_repo, terminal, args.speed, filepath
+            )
+        elif args.mode == 3:
+            cards, _, _, _, _ = play_session(
+                dict_repo, terminal, args.speed, args.path_forgotten
+            )
+            clean_forgotten(dict_repo, args.path_forgotten)
+        elif args.mode == 4:
+            filepath = create_path_to_dict(args.path, args.mode)
+            cards, _, _, _, _ = play_session(dict_repo, terminal, args.speed, filepath)
+        else:
+            raise NotImplementedError("Unsupported option")
+
+        update_statistics(
+            stats_repo, args.path_stats, cards, unknown, known, topic, max_words
         )
-    elif args.mode == 3:
-        cards, _, _, _, _ = play_session(
-            dict_repo, terminal, args.speed, args.path_forgotten
-        )
-        clean_forgotten(dict_repo, args.path_forgotten)
-    elif args.mode == 4:
-        filepath = create_path_to_dict(args.path, args.mode)
-        cards, _, _, _, _ = play_session(dict_repo, terminal, args.speed, filepath)
-    else:
-        raise NotImplementedError("Unsupported option")
-
-    update_statistics(
-        stats_repo, args.path_stats, cards, unknown, known, topic, max_words
-    )
 
 
-# except Exception as e:
-#     display.print_red(f"Error: {e}")
+    except Exception as e:
+        display.print_red(f"Error: {e}")
 
 if __name__ == "__main__":
     main()
