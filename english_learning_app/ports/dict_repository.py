@@ -1,0 +1,11 @@
+from typing import Protocol
+from english_learning_app.domain.word import Word
+from english_learning_app.domain.dict_statistic import DictStats
+
+
+class DictRepository(Protocol):
+    def load(self, path: str) -> list[Word]: ...
+    def load_stat(self, path: str) -> DictStats: ...
+    def save(
+        self, path: str, words: list[Word], dict_stat: DictStats | None = None
+    ) -> None: ...
