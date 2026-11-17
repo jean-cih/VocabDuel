@@ -73,9 +73,9 @@ def main() -> None:
             stats_repo, args.path_stats, cards, unknown, known, topic, max_words
         )
 
-
     except Exception as e:
         display.print_red(f"Error: {e}")
+
 
 if __name__ == "__main__":
     main()
