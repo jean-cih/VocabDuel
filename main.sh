@@ -20,7 +20,7 @@
 MACHINE_ID=$(cat /etc/machine-id)
 APP_SALT="your_app_secret_salt"
 HASHED_ID=$(echo -n "${APP_SALT}${MACHINE_ID}" | sha256sum | cut -d' ' -f1)
-HASH=$(cat key.txt)
+HASH=$(cat key.txt 2>/dev/null || true)
 
 PATH_TO_APP=""
 if [[ "$HASHED_ID" == "$HASH" ]];
