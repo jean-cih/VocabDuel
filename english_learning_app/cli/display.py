@@ -1,8 +1,8 @@
 import time
+import sys
 
 
-def load_preview() -> None:
-
+def load_preview(description_mode: str) -> bool:
     print("\n === The English Game ===\n")
 
     answer = input("Do you wanna understand in detail? (Yes | No) ").strip().lower()
@@ -14,17 +14,10 @@ def load_preview() -> None:
         )
         time.sleep(2)
 
-    # choose_option("\n I can offer you something:\n")
-    #
-    # try:
-    #     while True:
-    #         option = int(input(" What do You want: ").strip())
-    #         if option not in [1, 2]:
-    #             print_yellow("Please, tap option from the ragne 1, 2")
-    #             continue
-    #         return option
-    # except:
-    #     raise ValueError("Unknown option for This Game")
+        typing(f"\n You chose '{description_mode}'\n\n", 0.05)
+        time.sleep(1)
+        return False
+    return True
 
 
 def typing(text: str, delay: float) -> None:
@@ -69,8 +62,8 @@ def print_red(text: str, sep: str = "\n") -> None:
     print(f"\033[31m -- {text} --\033[0m{sep}")
 
 
-def print_yellow(text: str, sep: str = "\n") -> None:
-    print(f"\033[33m -- {text} --\033[0m{sep}")
+def print_yellow(text: str, start: str = "\n", sep: str = "\n") -> None:
+    print(f"{start}\033[33m -- {text} --\033[0m{sep}")
 
 
 def print_blue(text: str, sep: str = "\n") -> None:
@@ -95,3 +88,13 @@ def print_session_result(success_words: int, all_words: int, cards: int) -> None
 
 def print_interim_result(percent: float) -> None:
     print_green(f"- Completed by {percent:.1f}% -")
+
+
+def hide_cursor() -> None:
+    sys.stdout.write("\033[?25l")
+    sys.stdout.flush()
+
+
+def show_cursor() -> None:
+    sys.stdout.write("\033[?25h")
+    sys.stdout.flush()

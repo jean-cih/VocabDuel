@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 import argparse
-import os
 from datetime import date
 
 from english_learning_app.cli.display import print_green
@@ -48,30 +47,36 @@ def main() -> None:
         stats_repo = MarkdownStatsRepository()
         terminal = PosixTerminal()
 
-        display.load_preview()
+        with terminal.hidden_cursor():
+            desc_mode = menus.choose_mode(args.mode)
+            if display.load_preview(desc_mode):
+                print_green(f"| -- {desc_mode} -- |", "\n")
 
-        print_green(f"| {menus.choose_mode(args.mode)} |", "\n")
-
-        cards = unknown = known = max_words = 0
-        topic = ""
-        if args.mode == 1:
-            filepath = create_path_to_dict(args.path, args.mode)
-            add_words(dict_repo, terminal, filepath)
-        elif args.mode == 2:
-            filepath = create_path_to_dict(args.path, args.mode)
-            cards, known, unknown, topic, max_words = play_session(
-                dict_repo, terminal, args.speed, filepath
-            )
-        elif args.mode == 3:
-            cards, _, _, _, _ = play_session(
-                dict_repo, terminal, args.speed, args.path_forgotten
-            )
-            clean_forgotten(dict_repo, args.path_forgotten)
-        elif args.mode == 4:
-            filepath = create_path_to_dict(args.path, args.mode)
-            cards, _, _, _, _ = play_session(dict_repo, terminal, args.speed, filepath)
-        else:
-            raise NotImplementedError("Unsupported option")
+            cards = unknown = known = max_words = 0
+            topic = ""
+            if args.mode == 1:
+                filepath = create_path_to_dict(args.path, args.mode)
+                add_words(dict_repo, terminal, filepath)
+            elif args.mode == 2:
+                filepath = create_path_to_dict(args.path, args.mode)
+                format_session = menus.choose_format()
+                cards, known, unknown, topic, max_words = play_session(
+                    dict_repo, terminal, args.speed, filepath, format_session
+                )
+            elif args.mode == 3:
+                format_session = menus.choose_format()
+                cards, _, _, _, _ = play_session(
+                    dict_repo, terminal, args.speed, args.path_forgotten, format_session
+                )
+                clean_forgotten(dict_repo, args.path_forgotten)
+            elif args.mode == 4:
+                format_session = menus.choose_format()
+                filepath = create_path_to_dict(args.path, args.mode)
+                cards, _, _, _, _ = play_session(
+                    dict_repo, terminal, args.speed, filepath, format_session
+                )
+            else:
+                raise NotImplementedError("Unsupported option")
 
         update_statistics(
             stats_repo, args.path_stats, cards, unknown, known, topic, max_words

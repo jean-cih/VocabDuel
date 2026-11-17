@@ -16,7 +16,11 @@ MAX_PERCENT = 100.0
 
 
 def play_session(
-    dict_repo: DictRepository, terminal: Terminal, timeout: float, path: str
+    dict_repo: DictRepository,
+    terminal: Terminal,
+    timeout: float,
+    path: str,
+    format_session: int,
 ) -> tuple[int, int, int, str, int]:
     words = dict_repo.load(path)
     dict_stat = dict_repo.load_stat(path)
@@ -29,8 +33,14 @@ def play_session(
     known = unknown = success_words = 0
     cards = 0
     for index in indices:
+        front_side: str = words[index].english
+        other_side: str = words[index].russian
+
+        if format_session == 2:
+            front_side, other_side = other_side, front_side
+
         not_exit = terminal.read_line(
-            f"Word {words[index].number}: \033[48;2;255;165;0m\033[30m {words[index].english} \033[0m\nTap ... "
+            f"Word {words[index].number}: \033[48;2;255;165;0m\033[30m {front_side} \033[0m\nTap ... "
         )
         terminal.wait_key(timeout)
         if not_exit == "q":
@@ -38,7 +48,7 @@ def play_session(
             break
 
         answer = terminal.read_line(
-            f"Translate: \033[48;2;128;0;128m\033[97m {words[index].russian} \033[0m\nCheck (+ -) "
+            f"Translate: \033[48;2;128;0;128m\033[97m {other_side} \033[0m\nCheck (+ -) "
         )
 
         remembered = answer == "" or answer == "+"

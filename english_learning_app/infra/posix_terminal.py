@@ -1,4 +1,6 @@
 import sys, select
+from contextlib import contextmanager
+from english_learning_app.cli.display import hide_cursor, show_cursor
 
 
 class PosixTerminal:
@@ -9,3 +11,11 @@ class PosixTerminal:
 
     def read_line(self, prompt: str = "") -> str:
         return input(prompt)
+
+    @contextmanager
+    def hidden_cursor(self) -> None:
+        hide_cursor()
+        try:
+            yield
+        finally:
+            show_cursor()
