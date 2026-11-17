@@ -1,5 +1,5 @@
 import os
-from english_learning_app.cli.display import print_yellow
+from english_learning_app.cli import display
 
 
 def choose_category(folder_path: str) -> str | None:
@@ -18,7 +18,7 @@ def choose_category(folder_path: str) -> str | None:
         while True:
             index_file = int(input(" Choose The Theme: ").strip())
             if index_file not in list(range(1, num)):
-                print_yellow(
+                display.print_yellow(
                     f"Please, enter the number from the range {list(range(1, num))}"
                 )
                 continue
@@ -44,7 +44,7 @@ def choose_file(dir_path: str) -> str | None:
         while True:
             index_file = int(input(" Choose The File: ").strip())
             if index_file not in list(range(1, num)):
-                print_yellow(
+                display.print_yellow(
                     f"Please, enter the number from the range {list(range(1, num))}"
                 )
                 continue
@@ -54,20 +54,15 @@ def choose_file(dir_path: str) -> str | None:
 
 
 def choose_format() -> int:
-    print("\n == Options ==\n")
-    print("1.   Eng -> Rus")
-    print("2.   Rus -> Eng")
+    display.print_yellow("| Options |", "\n", "")
+    print("  1.   Eng -> Rus")
+    print("  2.   Rus -> Eng")
 
     while True:
-        try:
-            mode = int(input("Choose Opt: ").strip())
-
-            if mode not in [1, 2]:
-                print_yellow("Please, enter the number 1 or 2")
-                continue
-            return mode
-        except:
-            raise ValueError("Unknown mode for Game")
+        format_session = input("Choose Opt: ").strip()
+        if format_session in ("1", "2"):
+            return int(format_session)
+        display.print_yellow("Please, enter the number 1 or 2")
 
 
 def choose_level() -> float | None:
@@ -86,7 +81,7 @@ def choose_level() -> float | None:
             level = int(input("Choose Mode: ").strip())
 
             if level not in list(range(1, 7)):
-                print_yellow("Please, enter the number 1, 2, 3, 4, 5 or 6")
+                display.print_yellow("Please, enter the number 1, 2, 3, 4, 5 or 6")
                 continue
             return levels[level]
         except:
