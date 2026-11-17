@@ -2,6 +2,8 @@
 import argparse
 import os
 from datetime import date
+
+from english_learning_app.cli.display import print_green
 from english_learning_app.infra.markdown_dict_repo import MarkdownDictRepository
 from english_learning_app.infra.markdown_stats_repo import MarkdownStatsRepository
 from english_learning_app.infra.posix_terminal import PosixTerminal
@@ -47,6 +49,8 @@ def main() -> None:
         terminal = PosixTerminal()
 
         display.load_preview()
+
+        print_green(f"| {menus.choose_mode(args.mode)} |", '\n')
 
         cards = unknown = known = max_words = 0
         topic = ""

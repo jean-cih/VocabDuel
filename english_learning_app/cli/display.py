@@ -61,8 +61,8 @@ def choose_option(text: str) -> None:
     print(" 2. Practice")
 
 
-def print_green(text: str, sep: str = "\n") -> None:
-    print(f"\033[32m -- {text} --\033[0m{sep}")
+def print_green(text: str, start: str = "", sep: str = "\n") -> None:
+    print(f"{start}\033[32m -- {text} --\033[0m{sep}")
 
 
 def print_red(text: str, sep: str = "\n") -> None:
@@ -95,3 +95,4 @@ def print_session_result(success_words: int, all_words: int, cards: int) -> None
 
 def print_interim_result(percent: float) -> None:
     print_green(f"- Completed by {percent:.1f}% -")
+

@@ -38,15 +38,18 @@ jobs:
 
       - name: Jumpstart App
         run: |
-          ./main.sh 1 <<< "Yes" &
-          PID=$!
-          sleep 1
-          if kill -0 $PID 2>/dev/null; then
-            echo "✅ Application has launched successfully"
-            kill $PID
-            wait $PID 2>/dev/null || true
-          else
-            echo "❌ Fatal Error"
-            exit 1
-          fi
+          for mode in 1 2 3 4; do
+            echo "▶️ Checking mode $mode"
+            ./main.sh $mode <<< "Yes" &
+            PID=$!
+            sleep 1
+            if kill -0 $PID 2>/dev/null; then
+              echo "✅ Mode $mode: launched successfully"
+              kill $PID
+              wait $PID 2>/dev/null || true
+            else
+              echo "❌ Mode $mode: Fatal Error"
+              exit 1
+            fi
+          done
         shell: bash

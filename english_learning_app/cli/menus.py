@@ -3,7 +3,7 @@ from english_learning_app.cli.display import print_yellow
 
 
 def choose_category(folder_path: str) -> str | None:
-    print("\n == All Available Categories ==\n")
+    print(" == All Available Categories ==\n")
 
     paths = []
     num = 1
@@ -29,7 +29,7 @@ def choose_category(folder_path: str) -> str | None:
 
 def choose_file(dir_path: str) -> str | None:
 
-    print("\n == All Available Dictionaries ==\n")
+    print(" == All Available Dictionaries ==\n")
 
     paths = []
     num = 1
@@ -53,7 +53,7 @@ def choose_file(dir_path: str) -> str | None:
         raise ValueError("Unknown file's number")
 
 
-def choose_mode() -> int:
+def choose_format() -> int:
     print("\n == Options ==\n")
     print("1.   Eng -> Rus")
     print("2.   Rus -> Eng")
@@ -91,3 +91,14 @@ def choose_level() -> float | None:
             return levels[level]
         except:
             raise ValueError("Unknown level for Game")
+
+
+def choose_mode(mode: int) -> str:
+    dict_mode: dict[int, str] = {
+        1: "Add New Words",
+        2: "Practice a List",
+        3: "Review Forgotten Words",
+        4: "Practice a Category",
+    }
+    return dict_mode[mode]
+
