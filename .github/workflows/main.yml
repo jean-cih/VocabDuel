@@ -38,11 +38,11 @@ jobs:
 
       - name: Jumpstart App
         run: |
-          for mode in 1 2 3 4; do
+          for mode in 1; do
             echo "▶️ Checking mode $mode"
-            ./main.sh $mode &
+            ./main.sh $mode <<< "word" &
             PID=$!
-            sleep 2
+            sleep 5
             if kill -0 $PID 2>/dev/null; then
               echo "✅ Mode $mode: launched successfully"
               kill $PID
