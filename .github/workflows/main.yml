@@ -34,9 +34,22 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12.3'
+          python-version: '3.12'
 
       - name: Jumpstart App
         run: |
-          ./main.sh 2 && echo "✅ Aplication has launched successfully" || echo "❌ Fatal Error"
+          for mode in 1 2 3 4; do
+            echo "▶️ Checking mode $mode"
+            ./main.sh $mode &
+            PID=$!
+            sleep 2
+            if kill -0 $PID 2>/dev/null; then
+              echo "✅ Mode $mode: launched successfully"
+              kill $PID
+              wait $PID 2>/dev/null || true
+            else
+              echo "❌ Mode $mode: Fatal Error"
+              exit 1
+            fi
+          done
         shell: bash
