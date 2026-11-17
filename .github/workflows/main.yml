@@ -38,9 +38,9 @@ jobs:
 
       - name: Jumpstart App
         run: |
-          ./main.sh 1 &
+          ./main.sh 1 <<< "Yes" &
           PID=$!
-          sleep 5
+          sleep 1
           if kill -0 $PID 2>/dev/null; then
             echo "✅ Application has launched successfully"
             kill $PID
