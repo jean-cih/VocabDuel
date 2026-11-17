@@ -101,4 +101,3 @@ def choose_mode(mode: int) -> str:
         4: "Practice a Category",
     }
     return dict_mode[mode]
-

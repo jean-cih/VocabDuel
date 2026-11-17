@@ -95,4 +95,3 @@ def print_session_result(success_words: int, all_words: int, cards: int) -> None
 
 def print_interim_result(percent: float) -> None:
     print_green(f"- Completed by {percent:.1f}% -")
-

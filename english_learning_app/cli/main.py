@@ -50,7 +50,7 @@ def main() -> None:
 
         display.load_preview()
 
-        print_green(f"| {menus.choose_mode(args.mode)} |", '\n')
+        print_green(f"| {menus.choose_mode(args.mode)} |", "\n")
 
         cards = unknown = known = max_words = 0
         topic = ""
