@@ -32,6 +32,12 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def create_path_to_dict(path: str, mode: int) -> str:
+    dir_path = menus.choose_category(path)
+    filepath = menus.choose_file(dir_path) if mode != 4 else dir_path
+    return filepath
+
+
 def main() -> None:
     # try:
     args = build_parser().parse_args()
@@ -42,15 +48,13 @@ def main() -> None:
 
     display.load_preview()
 
-    dir_path = menus.choose_category(args.path)
-
-    filepath = menus.choose_file(dir_path) if args.mode != 4 else dir_path
-
     cards = unknown = known = max_words = 0
     topic = ""
     if args.mode == 1:
+        filepath = create_path_to_dict(args.path, args.mode)
         add_words(dict_repo, terminal, filepath)
     elif args.mode == 2:
+        filepath = create_path_to_dict(args.path, args.mode)
         cards, known, unknown, topic, max_words = play_session(
             dict_repo, terminal, args.speed, filepath
         )
@@ -60,6 +64,7 @@ def main() -> None:
         )
         clean_forgotten(dict_repo, args.path_forgotten)
     elif args.mode == 4:
+        filepath = create_path_to_dict(args.path, args.mode)
         cards, _, _, _, _ = play_session(dict_repo, terminal, args.speed, filepath)
     else:
         raise NotImplementedError("Unsupported option")
