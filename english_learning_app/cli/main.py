@@ -30,6 +30,9 @@ def build_parser() -> argparse.ArgumentParser:
         type=str,
         help="Path to statistics file",
     )
+    parser.add_argument(
+        "--no-color", action="store_true", help="Disable colored output"
+    )
     return parser
 
 
@@ -47,6 +50,9 @@ def main() -> None:
         stats_repo = MarkdownStatsRepository()
         terminal = PosixTerminal()
 
+        if args.no_color:
+            display.set_color(False)
+
         with terminal.hidden_cursor():
             desc_mode = menus.choose_mode(args.mode)
             if display.load_preview(desc_mode):
@@ -61,19 +67,19 @@ def main() -> None:
                 filepath = create_path_to_dict(args.path, args.mode)
                 format_session = menus.choose_format()
                 cards, known, unknown, topic, max_words = play_session(
-                    dict_repo, terminal, args.speed, filepath, format_session
+                    dict_repo, terminal, None, filepath, format_session
                 )
             elif args.mode == 3:
                 format_session = menus.choose_format()
                 cards, _, _, _, _ = play_session(
-                    dict_repo, terminal, args.speed, args.path_forgotten, format_session
+                    dict_repo, terminal, None, args.path_forgotten, format_session
                 )
                 clean_forgotten(dict_repo, args.path_forgotten)
             elif args.mode == 4:
                 format_session = menus.choose_format()
                 filepath = create_path_to_dict(args.path, args.mode)
                 cards, _, _, _, _ = play_session(
-                    dict_repo, terminal, args.speed, filepath, format_session
+                    dict_repo, terminal, None, filepath, format_session
                 )
             else:
                 raise NotImplementedError("Unsupported option")
