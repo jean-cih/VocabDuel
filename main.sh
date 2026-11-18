@@ -34,6 +34,6 @@ PATH_TO_DICTS="${PATH_TO_APP}Dictionaries/"
 PATH_TO_FORGOTTEN="${PATH_TO_APP}Forgotten.md"
 PATH_TO_STATS="${PATH_TO_APP}Knowledge statistics.md"
 
-python3 -m english_learning_app.cli.main --mode $1 --format 2 --speed 0 --path "$PATH_TO_DICTS" --path_forgotten "$PATH_TO_FORGOTTEN" --path_stats "$PATH_TO_STATS"
+python3 -m english_learning_app.cli.main --mode $@ --format 2 --speed 0 --path "$PATH_TO_DICTS" --path_forgotten "$PATH_TO_FORGOTTEN" --path_stats "$PATH_TO_STATS"
 
 exit 0

@@ -1,6 +1,26 @@
 import time
 import sys
 
+_COLORS = {
+    "green": "\033[32m",
+    "red": "\033[31m",
+    "yellow": "\033[33m",
+    "blue": "\033[34m",
+    "purple": "\033[35m",
+    "reset": "\033[0m",
+}
+
+_USE_COLOR = True
+
+
+def set_color(enabled: bool) -> None:
+    global _USE_COLOR
+    _USE_COLOR = enabled
+
+
+def _c(text: str, color: str) -> str:
+    return f"{_COLORS[color]}{text}{_COLORS['reset']}" if _USE_COLOR else text
+
 
 def load_preview(description_mode: str) -> bool:
     print("\n === The English Game ===\n")
@@ -55,23 +75,28 @@ def choose_option(text: str) -> None:
 
 
 def print_green(text: str, start: str = "", sep: str = "\n") -> None:
-    print(f"{start}\033[32m -- {text} --\033[0m{sep}")
+    color_text = _c(text, "green")
+    print(f"{start}{color_text}{sep}")
 
 
 def print_red(text: str, sep: str = "\n") -> None:
-    print(f"\033[31m -- {text} --\033[0m{sep}")
+    color_text = _c(text, "red")
+    print(f"{color_text}{sep}")
 
 
 def print_yellow(text: str, start: str = "\n", sep: str = "\n") -> None:
-    print(f"{start}\033[33m -- {text} --\033[0m{sep}")
+    color_text = _c(text, "yellow")
+    print(f"{start}{color_text}{sep}")
 
 
 def print_blue(text: str, sep: str = "\n") -> None:
-    print(f"\033[34m -- {text} --\033[0m{sep}")
+    color_text = _c(text, "blue")
+    print(f"{color_text}{sep}")
 
 
 def print_purple(text: str, start: str = "", sep: str = "\n") -> None:
-    print(f"{start}\033[35m -- {text} --\033[0m{sep}")
+    color_text = _c(text, "purple")
+    print(f"{start}{color_text}{sep}")
 
 
 def print_add_words_result(words_counter: int) -> None:
@@ -98,3 +123,18 @@ def hide_cursor() -> None:
 def show_cursor() -> None:
     sys.stdout.write("\033[?25h")
     sys.stdout.flush()
+
+
+def highlight(text: str, bg: tuple[int, int, int], fg: int = 30) -> str:
+    if not _USE_COLOR:
+        return text
+    r, g, b = bg
+    return f"\033[48;2;{r};{g};{b}m\033[{fg}m {text} \033[0m"
+
+
+def print_word_prompt(number: int, text: str) -> None:
+    print(f"Word {number}: {highlight(text, (255, 165, 0), 30)}")
+
+
+def print_translate_prompt(text: str) -> None:
+    print(f"Translate: {highlight(text, (128, 0, 128), 97)}")

@@ -3,14 +3,7 @@ import random
 from english_learning_app.ports.dict_repository import DictRepository
 from english_learning_app.ports.terminal import Terminal
 from english_learning_app.domain.rules import apply_answer
-from english_learning_app.cli.display import (
-    print_green,
-    print_blue,
-    print_yellow,
-    print_interim_result,
-    print_session_result,
-    print_purple,
-)
+from english_learning_app.cli import display
 
 MAX_PERCENT = 100.0
 
@@ -18,7 +11,7 @@ MAX_PERCENT = 100.0
 def play_session(
     dict_repo: DictRepository,
     terminal: Terminal,
-    timeout: float,
+    timeout: float | None,
     path: str,
     format_session: int,
 ) -> tuple[int, int, int, str, int]:
@@ -28,7 +21,7 @@ def play_session(
     indices = [i for i in range(len(words))]
     random.shuffle(indices)
 
-    print_purple(f"All Words: {len(indices)}", "\n")
+    display.print_purple(f"All Words: {len(indices)}", "\n")
 
     known = unknown = success_words = 0
     cards = 0
@@ -39,37 +32,36 @@ def play_session(
         if format_session == 2:
             front_side, other_side = other_side, front_side
 
-        not_exit = terminal.read_line(
-            f"Word {words[index].number}: \033[48;2;255;165;0m\033[30m {front_side} \033[0m\nTap ... "
-        )
-        terminal.wait_key(timeout)
+        display.print_word_prompt(words[index].number, front_side)
+        not_exit = terminal.wait_key_blinking("  Tap any key to reveal…", timeout, 0.5)
         if not_exit == "q":
-            print_yellow("exit")
+            display.print_yellow(" - exit -")
             break
 
-        answer = terminal.read_line(
-            f"Translate: \033[48;2;128;0;128m\033[97m {other_side} \033[0m\nCheck (+ -) "
+        display.print_translate_prompt(other_side)
+        answer = terminal.wait_key_blinking(
+            "  [Enter] know   [any] don't   [q] quit", timeout, 0.5
         )
 
-        remembered = answer == "" or answer == "+"
+        remembered = answer == "\n" or answer == "+"
         if remembered and words[index].known:
             success_words += 1
-            print_green("already done")
+            display.print_green(" - 🔥 already done -")
         elif remembered and not words[index].known:
             known += 1
-            print_green("done")
+            display.print_green(" - 👍 done -")
         elif not remembered and words[index].known:
             unknown += 1
-            print_blue("forgot")
+            display.print_blue(" - 🤷 forgot -")
         elif not remembered and not words[index].known:
-            print_blue("unknown")
+            display.print_blue(" - 🙃 unknown -")
 
         words[index] = apply_answer(words[index], remembered)
 
         cards += 1
         if cards % (compute_divider(len(indices)) * len(indices) / 100) == 0:
             percent: float = MAX_PERCENT * cards / len(indices)
-            print_interim_result(percent)
+            display.print_interim_result(percent)
 
     if cards > 0 and dict_stat is not None:
         dict_stat = dict_stat.add_session(cards, unknown, known)
@@ -77,7 +69,7 @@ def play_session(
     dict_repo.save(path, words, dict_stat)
 
     success_words += known
-    print_session_result(success_words, len(words), cards)
+    display.print_session_result(success_words, len(words), cards)
 
     topic = path.split("/")[-2]
 
