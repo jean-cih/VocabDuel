@@ -54,10 +54,7 @@ def choose_file(dir_path: str) -> str | None:
 
 
 def choose_format() -> int:
-    display.print_yellow("| Options |", "\n", "")
-    print("  1.   Eng -> Rus")
-    print("  2.   Rus -> Eng")
-
+    display.print_choose_format()
     while True:
         format_session = input("Choose Opt: ").strip()
         if format_session in ("1", "2"):

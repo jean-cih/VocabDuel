@@ -5,7 +5,7 @@ import time
 
 
 class PosixTerminal:
-    def wait_key(self, timeout: float) -> str | None:
+    def wait_key(self, timeout: float | None) -> str | None:
         if select.select([sys.stdin], [], [], timeout)[0]:
             return sys.stdin.read(1)
         return None
