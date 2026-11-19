@@ -18,11 +18,11 @@ def set_color(enabled: bool) -> None:
     _USE_COLOR = enabled
 
 
-def _c(text: str, color: str) -> str:
-    return f"{_COLORS[color]}{text}{_COLORS['reset']}" if _USE_COLOR else text
+def _c(text: str, fore_color: str) -> str:
+    return f"{_COLORS[fore_color]}{text}{_COLORS['reset']}" if _USE_COLOR else text
 
 
-def load_preview(description_mode: str) -> bool:
+def load_preview(description_mode: str) -> None:
     print("\n === The English Game ===\n")
 
     answer = input("Do you wanna understand in detail? (Yes | No) ").strip().lower()
@@ -36,8 +36,6 @@ def load_preview(description_mode: str) -> bool:
 
         typing(f"\n You chose '{description_mode}'\n\n", 0.05)
         time.sleep(1)
-        return False
-    return True
 
 
 def typing(text: str, delay: float) -> None:
@@ -106,9 +104,54 @@ def print_add_words_result(words_counter: int) -> None:
 def print_session_result(success_words: int, all_words: int, cards: int) -> None:
     percent_full_list: int = int(100 * success_words / all_words)
     percent_comp: int = int(100 * success_words / cards)
-    print_purple(
-        f"- Result: {success_words}/{all_words} ({percent_full_list}%) | Comprehension: ({percent_comp}%) -"
-    )
+
+    if percent_comp >= 80:
+        bg = (34, 139, 34)
+    elif percent_comp >= 50:
+        bg = (184, 134, 11)
+    else:
+        bg = (178, 34, 34)
+
+    text = f" Result: {success_words}/{all_words} ({percent_full_list}%) | Comprehension: ({percent_comp}%) "
+    color_text = highlight(text, bg, 97)
+    border = highlight(" " * len(text), bg, 97)
+
+    print(border)
+    print(color_text)
+    print(border)
+
+
+def print_session_mode(desc_mode: str) -> None:
+    bg = tuple()
+    match desc_mode:
+        case "Add New Words":
+            bg = (30, 144, 255)
+        case "Practice a List":
+            bg = (0, 128, 128)
+        case "Review Forgotten Words":
+            bg = (139, 0, 139)
+        case "Practice a Category":
+            bg = (70, 130, 180)
+
+    color_text = highlight(f"- {desc_mode} -", bg, 97)
+    border = highlight(" " * len(f"- {desc_mode} -"), bg, 97)
+
+    print(border)
+    print(color_text)
+    print(border, end="\n\n")
+
+
+def print_choose_format(length: int = 20) -> None:
+    bg = (255, 165, 0)
+    fg = 30
+
+    color_title = highlight(f"{'- Format -':^{length}}", bg, fg)
+    eng_to_rus = highlight(f"{'  1.   Eng -> Rus':^{length}}", bg, fg)
+    rus_to_eng = highlight(f"{'  2.   Rus -> Eng':^{length}}", bg, fg)
+
+    print(color_title)
+    print(eng_to_rus)
+    print(rus_to_eng)
 
 
 def print_interim_result(percent: float) -> None:

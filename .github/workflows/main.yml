@@ -40,7 +40,7 @@ jobs:
         run: |
           for mode in 1 2 3 4; do
             echo "▶️ Checking mode $mode"
-            ./main.sh $mode <<< "Yes" &
+            ./main.sh --mode $mode <<< "Yes" &
             PID=$!
             sleep 1
             if kill -0 $PID 2>/dev/null; then

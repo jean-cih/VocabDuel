@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 import argparse
-from datetime import date
 
-from english_learning_app.cli.display import print_green
 from english_learning_app.infra.markdown_dict_repo import MarkdownDictRepository
 from english_learning_app.infra.markdown_stats_repo import MarkdownStatsRepository
 from english_learning_app.infra.posix_terminal import PosixTerminal
-from english_learning_app.use_cases.play_session import play_session
+from english_learning_app.use_cases.play_session import (
+    play_session,
+    write_forgotten_word,
+)
 from english_learning_app.use_cases.clean_forgotten import clean_forgotten
 from english_learning_app.use_cases.update_statistics import update_statistics
 from english_learning_app.use_cases.add_words import add_words
@@ -53,10 +54,14 @@ def main() -> None:
         if args.no_color:
             display.set_color(False)
 
+        timeout = None
+        if args.speed > 0:
+            timeout = args.speed
+
         with terminal.hidden_cursor():
             desc_mode = menus.choose_mode(args.mode)
-            if display.load_preview(desc_mode):
-                print_green(f"| -- {desc_mode} -- |", "\n")
+            display.load_preview(desc_mode)
+            display.print_session_mode(desc_mode)
 
             cards = unknown = known = max_words = 0
             topic = ""
@@ -66,21 +71,23 @@ def main() -> None:
             elif args.mode == 2:
                 filepath = create_path_to_dict(args.path, args.mode)
                 format_session = menus.choose_format()
-                cards, known, unknown, topic, max_words = play_session(
-                    dict_repo, terminal, None, filepath, format_session
+                cards, known, unknown, topic, max_words, forgotten_words = play_session(
+                    dict_repo, terminal, timeout, filepath, format_session
                 )
+                write_forgotten_word(dict_repo, forgotten_words, args.path_forgotten)
             elif args.mode == 3:
                 format_session = menus.choose_format()
-                cards, _, _, _, _ = play_session(
-                    dict_repo, terminal, None, args.path_forgotten, format_session
+                cards, _, _, _, _, _ = play_session(
+                    dict_repo, terminal, timeout, args.path_forgotten, format_session
                 )
                 clean_forgotten(dict_repo, args.path_forgotten)
             elif args.mode == 4:
                 format_session = menus.choose_format()
                 filepath = create_path_to_dict(args.path, args.mode)
-                cards, _, _, _, _ = play_session(
-                    dict_repo, terminal, None, filepath, format_session
+                cards, _, _, _, _, forgotten_words = play_session(
+                    dict_repo, terminal, timeout, filepath, format_session
                 )
+                write_forgotten_word(dict_repo, forgotten_words, args.path_forgotten)
             else:
                 raise NotImplementedError("Unsupported option")
 
